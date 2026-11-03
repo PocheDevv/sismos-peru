@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Registrar reporte de afectación')}"></head>
+<head th:replace="~{fragments/layout :: head(${reporte == null} ? 'Registrar reporte de afectación' : 'Editar reporte de afectación')}"></head>
 <body>
 <div th:replace="~{fragments/layout :: barra('sismos')}"></div>
-<main class="contenedor">
+<main class="contenedor" th:with="esEditar=${reporte != null}">
     <p class="breadcrumb">
         <a th:href="@{/sismos}">Sismos</a> /
         <a th:href="@{/sismos/{id}(id=${sismo.id})}" th:text="${sismo.codigo}"></a> /
-        Registrar reporte de afectación
+        <span th:text="${esEditar} ? 'Editar reporte de afectación' : 'Registrar reporte de afectación'"></span>
     </p>
-    <h1>Registrar reporte de afectación</h1>
+    <h1 th:text="${esEditar} ? 'Editar reporte de afectación' : 'Registrar reporte de afectación'"></h1>
     <p class="subtitulo">
         Sismo <strong th:text="${sismo.codigo}"></strong>
         · <span th:text="${#temporals.format(sismo.fechaHora, 'dd/MM/yyyy HH:mm')}"></span>
@@ -17,8 +17,9 @@
         Los campos marcados con * son obligatorios.
     </p>
 
-    <form method="post" th:object="${reporteForm}" novalidate th:action="@{/sismos/{id}/reportes(id=${sismo.id})}">
-        <div th:replace="~{fragments/layout :: erroresFormulario('registrar el reporte')}"></div>
+    <form method="post" th:object="${reporteForm}" novalidate
+          th:action="${esEditar} ? @{/sismos/{s}/reportes/{id}(s=${sismo.id}, id=${reporte.id})} : @{/sismos/{id}/reportes(id=${sismo.id})}">
+        <div th:replace="~{fragments/layout :: erroresFormulario(${esEditar} ? 'guardar el reporte' : 'registrar el reporte')}"></div>
 
         <section class="tarjeta">
             <div class="seccion-titulo">Datos de la afectación</div>
@@ -28,7 +29,7 @@
                     <select th:field="*{tipoDanoId}" th:errorclass="campo-error">
                         <option value="">Seleccione</option>
                         <option th:each="t : ${tiposDano}" th:value="${t.id}"
-                                th:text="${t.nombre} + ' (' + ${t.sector} + ')'"></option>
+                                th:text="${t.nombre} + (${t.activo} ? '' : ' (inactivo)')"></option>
                     </select>
                     <span class="ayuda-error" th:if="${#fields.hasErrors('tipoDanoId')}" th:errors="*{tipoDanoId}"></span>
                     <span class="ayuda" th:unless="${#fields.hasErrors('tipoDanoId')}">Solo se muestran los tipos de daño activos.</span>
@@ -55,8 +56,8 @@
                 </label>
                 <label>
                     <span>Estado</span>
-                    <input value="PENDIENTE" disabled>
-                    <span class="ayuda">Se asigna automáticamente al registrar.</span>
+                    <input th:value="${esEditar} ? ${reporte.estado} : 'PENDIENTE'" disabled>
+                    <span class="ayuda" th:text="${esEditar} ? 'El estado no se modifica desde aquí.' : 'Se asigna automáticamente al registrar.'"></span>
                 </label>
                 <label class="ancho-completo">
                     <span class="campo-obligatorio">Descripción</span>
@@ -70,7 +71,7 @@
         </section>
 
         <div class="acciones">
-            <button class="boton" type="submit">Registrar reporte</button>
+            <button class="boton" type="submit" th:text="${esEditar} ? 'Guardar cambios' : 'Registrar reporte'"></button>
             <a class="boton-secundario" th:href="@{/sismos/{id}(id=${sismo.id})}">Cancelar</a>
         </div>
     </form>

@@ -41,6 +41,13 @@ public class ReporteDanoService {
     }
 
     @Transactional(readOnly = true)
+    public ReporteDano buscarReporte(Long sismoId, Long id) {
+        return reporteDanoRepository.findById(id)
+                .filter(reporte -> reporte.getSismo().getId().equals(sismoId))
+                .orElseThrow(() -> new RecursoNoEncontradoException("No existe el reporte de afectación solicitado."));
+    }
+
+    @Transactional(readOnly = true)
     public List<ReporteDano> listarPorSismo(Long sismoId) {
         return reporteDanoRepository.findBySismoIdOrderByFechaReporteDesc(sismoId);
     }
@@ -62,6 +69,13 @@ public class ReporteDanoService {
     public String motivoParaNoReportar(Sismo sismo) {
         if (Sismo.ESTADO_CERRADO.equals(sismo.getEstado())) {
             return "El sismo " + sismo.getCodigo() + " está Cerrado y no admite nuevos reportes de afectación.";
+        }
+        return null;
+    }
+
+    public String motivoParaNoEditar(ReporteDano reporte) {
+        if (reporte.isCerrado()) {
+            return "El reporte está CERRADO y ya no se puede modificar.";
         }
         return null;
     }
@@ -91,6 +105,27 @@ public class ReporteDanoService {
         reporte.setEstado(ReporteDano.ESTADO_PENDIENTE);
         aplicarDatos(reporte, form);
         return reporteDanoRepository.save(reporte);
+    }
+
+    @Transactional
+    public ReporteDano actualizar(Long sismoId, Long id, ReporteDanoForm form) {
+        ReporteDano reporte = buscarReporte(sismoId, id);
+        String motivo = motivoParaNoEditar(reporte);
+        if (motivo != null) {
+            throw new ReglaNegocioException(null, motivo);
+        }
+        aplicarDatos(reporte, form);
+        return reporteDanoRepository.save(reporte);
+    }
+
+    public ReporteDanoForm formDe(ReporteDano reporte) {
+        ReporteDanoForm form = new ReporteDanoForm();
+        form.setTipoDanoId(reporte.getTipoDano().getId());
+        form.setFechaReporte(reporte.getFechaReporte());
+        form.setCantidadAfectada(reporte.getCantidadAfectada());
+        form.setDescripcion(reporte.getDescripcion());
+        form.setNivel(reporte.getNivel());
+        return form;
     }
 
     private void aplicarDatos(ReporteDano reporte, ReporteDanoForm form) {
