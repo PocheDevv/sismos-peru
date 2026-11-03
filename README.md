@@ -36,9 +36,9 @@ Curso Desarrollo de Aplicaciones Empresariales Avanzado · NRC 3703 · Grupo 6.
 | 2 | HU-11 | Asociar un sismo a la estación que lo registró | Cristian | ✅ |
 | 2 | HU-30 | Filtrar sismos por estado del evento | Cristian | ✅ |
 | 2 | HU-31 | Buscar un sismo por código o referencia geográfica | Nick | ✅ |
-| 3 | HU-12 | Registrar reportes de afectación (daño) | Víctor | ⏳ |
-| 3 | HU-13 | Consultar reportes de afectación | Víctor | ⏳ |
-| 3 | HU-25 | Editar un reporte de afectación | Víctor | ⏳ |
+| 3 | HU-12 | Registrar reportes de afectación (daño) | Víctor | ✅ |
+| 3 | HU-13 | Consultar reportes de afectación | Víctor | ✅ |
+| 3 | HU-25 | Editar un reporte de afectación | Víctor | ✅ |
 | 3 | HU-26 | Actualizar el estado de un reporte | Cristian | ⏳ |
 | 3 | HU-29 | Marcar un sismo como relevante para seguimiento | Cristian | ⏳ |
 | 3 | HU-14 | Dar seguimiento a un sismo relevante | Cristian | ⏳ |
