@@ -37,13 +37,13 @@ Curso Desarrollo de Aplicaciones Empresariales Avanzado · NRC 3703 · Grupo 6.
 | 2 | HU-30 | Filtrar sismos por estado del evento | Cristian | ✅ |
 | 2 | HU-31 | Buscar un sismo por código o referencia geográfica | Nick | ✅ |
 | 3 | HU-12 | Registrar reportes de afectación (daño) | Víctor | ⏳ |
-| 3 | HU-13 | Consultar reportes de afectación | Cristian | ⏳ |
-| 3 | HU-25 | Editar un reporte de afectación | Nick | ⏳ |
-| 3 | HU-26 | Actualizar el estado de un reporte | José | ⏳ |
-| 3 | HU-29 | Marcar un sismo como relevante para seguimiento | Víctor | ⏳ |
-| 3 | HU-14 | Dar seguimiento a un sismo relevante | Nick | ⏳ |
-| 3 | HU-28 | Ver el total de personas afectadas por sismo | Cristian | ⏳ |
-| 3 | HU-27 | Filtrar reportes por tipo, nivel y estado | Víctor | ⏳ |
+| 3 | HU-13 | Consultar reportes de afectación | Víctor | ⏳ |
+| 3 | HU-25 | Editar un reporte de afectación | Víctor | ⏳ |
+| 3 | HU-26 | Actualizar el estado de un reporte | Cristian | ⏳ |
+| 3 | HU-29 | Marcar un sismo como relevante para seguimiento | Cristian | ⏳ |
+| 3 | HU-14 | Dar seguimiento a un sismo relevante | Cristian | ⏳ |
+| 3 | HU-28 | Ver el total de personas afectadas por sismo | Nick | ⏳ |
+| 3 | HU-27 | Filtrar reportes por tipo, nivel y estado | Nick | ⏳ |
 | PA3 | — | Migración a Spring Boot, catálogos e importación CSV | José | ✅ |
 
 ## Modelo de datos
@@ -93,17 +93,21 @@ Ejemplos completos: `SismoController` + `SismoService` + `SismoForm` + `template
 Ya existen la tabla, la entidad y el repositorio de **ReporteDano** y **SeguimientoSismo**, y la columna
 `sismo.relevante`. Falta construir las pantallas:
 
+Orden sugerido (por dependencias): primero HU-12; luego HU-13, HU-25, HU-26 y HU-28; al final HU-27.
+HU-29 y HU-14 no dependen de los reportes y se pueden hacer en paralelo.
+
 - **HU-12 (Víctor):** `ReporteDanoForm` + `ReporteDanoService.registrar` + `ReporteDanoController`.
   Registrar desde el detalle del sismo (`/sismos/{id}/reportes/nuevo`). Reglas: el tipo de daño debe
   estar ACTIVO (`TipoDanoService.activos()` para el select), cantidad afectada ≥ 0, descripción obligatoria.
-- **HU-13 (Cristian):** listado de reportes (general y en el detalle del sismo, donde está el comentario
+- **HU-13 (Víctor):** listado de reportes (general y en el detalle del sismo, donde está el comentario
   `Sprint 3` en `sismos/detalle.html`). `ReporteDanoRepository.findBySismoIdOrderByFechaReporteDesc`.
-- **HU-25 (Nick):** editar un reporte reutilizando el formulario de HU-12.
-- **HU-26 (José):** cambiar el estado del reporte (PENDIENTE, VERIFICADO, CERRADO).
-- **HU-27 (Víctor):** filtros de reportes por tipo de daño, nivel y estado.
-- **HU-28 (Cristian):** total de afectados en el detalle del sismo (consulta `SUM(cantidadAfectada)`).
-- **HU-29 (Víctor):** marcar o desmarcar `relevante` desde el detalle del sismo.
-- **HU-14 (Nick):** bitácora de seguimiento de un sismo relevante (`SeguimientoSismo`).
+- **HU-25 (Víctor):** editar un reporte reutilizando el formulario de HU-12.
+- **HU-26 (Cristian):** cambiar el estado del reporte (PENDIENTE → VERIFICADO → CERRADO; un reporte
+  CERRADO ya no se modifica).
+- **HU-29 (Cristian):** marcar o desmarcar `relevante` desde el detalle del sismo.
+- **HU-14 (Cristian):** bitácora de seguimiento de un sismo relevante (`SeguimientoSismo`).
+- **HU-28 (Nick):** total de afectados en el detalle del sismo (consulta `SUM(cantidadAfectada)`).
+- **HU-27 (Nick):** filtros de reportes por tipo de daño, nivel y estado.
 
 Reglas del equipo: una rama por HU desde `main` actualizado, Pull Request para unir, no subir
 `application-local.properties`, `target/` ni `.idea/`.
