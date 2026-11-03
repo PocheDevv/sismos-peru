@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Error')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('')}"></div>
+<main class="contenedor">
+    <section class="tarjeta confirmacion">
+        <h1>No se pudo completar la operación</h1>
+        <p class="subtitulo" th:text="${mensaje} ?: 'Ocurrió un error inesperado.'"></p>
+        <a class="boton" th:href="@{/sismos}">Ir a la lista de sismos</a>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Importar CSV')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('importacion')}"></div>
+<main class="contenedor">
+    <h1>Importar datos maestros</h1>
+    <p class="subtitulo">Carga los catálogos iniciales desde los archivos CSV del curso. Importe primero el ubigeo.</p>
+
+    <div class="alerta alerta-error" th:if="${error}" th:text="${error}"></div>
+
+    <section class="tarjeta formulario-corto">
+        <form method="post" th:action="@{/importacion}" enctype="multipart/form-data">
+            <div class="formulario-grid dos-columnas">
+                <label>
+                    <span class="campo-obligatorio">Catálogo</span>
+                    <select name="catalogo">
+                        <option value="">Seleccione</option>
+                        <option th:each="c : ${catalogos}" th:value="${c.name()}"
+                                th:text="${c.nombre} + ' (' + ${c.archivoSugerido} + ')'"
+                                th:selected="${c == catalogoElegido}"></option>
+                    </select>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Archivo CSV</span>
+                    <input type="file" name="archivo" accept=".csv,text/csv">
+                </label>
+            </div>
+            <div class="acciones" style="margin-top: 16px;">
+                <button class="boton" type="submit">Importar</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="tarjeta" th:if="${resultado != null}">
+        <h2 class="titulo-tarjeta" th:text="'Resultado: ' + ${resultado.catalogo.nombre} + ' (' + ${resultado.archivo} + ')'"></h2>
+        <div class="cifras">
+            <div><strong th:text="${resultado.filasLeidas}"></strong>filas leídas</div>
+            <div><strong th:text="${resultado.importadas}"></strong>importadas</div>
+            <div><strong th:text="${resultado.rechazadas.size()}"></strong>rechazadas</div>
+        </div>
+        <div class="tabla-scroll" th:if="${!resultado.rechazadas.isEmpty()}">
+            <table>
+                <thead><tr><th>Línea</th><th>Código</th><th>Motivo del rechazo</th></tr></thead>
+                <tbody>
+                <tr th:each="f : ${resultado.rechazadas}">
+                    <td th:text="${f.linea}"></td>
+                    <td th:text="${f.codigo.isEmpty()} ? '—' : ${f.codigo}"></td>
+                    <td style="white-space: normal" th:text="${f.motivo}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="alerta alerta-exito" th:if="${resultado.rechazadas.isEmpty()}">Todas las filas se importaron correctamente.</p>
+    </section>
+
+    <section class="tarjeta">
+        <h2 class="titulo-tarjeta">Columnas mínimas de cada archivo</h2>
+        <table>
+            <thead><tr><th>Archivo</th><th>Columnas</th></tr></thead>
+            <tbody>
+            <tr th:each="c : ${catalogos}">
+                <td th:text="${c.archivoSugerido}"></td>
+                <td class="columnas-esperadas" th:text="${#strings.listJoin(c.columnas, ', ')}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="nota">Cada fila se valida igual que en el formulario: código único, campos obligatorios y valores permitidos.
+            Las filas válidas se guardan y las rechazadas se listan con su motivo.</p>
+    </section>
+</main>
+</body>
+</html>

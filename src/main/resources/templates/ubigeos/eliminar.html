@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Eliminar ubigeo')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('ubigeos')}"></div>
+<main class="contenedor">
+    <p class="breadcrumb"><a th:href="@{/ubigeos}">Ubigeos</a>
+        <th:block th:each="u : ${ubigeo.ruta}"> / <span th:text="${u.nombre}"></span></th:block> / Eliminar</p>
+
+    <section class="tarjeta confirmacion">
+        <th:block th:replace="~{fragments/layout :: mensajes}"></th:block>
+        <h1 th:text="'¿Eliminar ' + ${#strings.toLowerCase(ubigeo.tipo.nombre)} + ' ' + ${ubigeo.nombre} + '?'"></h1>
+        <div class="resumen">
+            <div><span>Código</span><strong th:text="${ubigeo.codigo}"></strong></div>
+            <div><span>Ubicación</span><strong th:text="${ubigeo.ubicacionCompleta}"></strong></div>
+            <div><span>Estado</span><strong th:text="${ubigeo.estado}"></strong></div>
+        </div>
+        <div class="alerta alerta-error" th:if="${motivo != null}" th:text="${motivo}"></div>
+        <form method="post" th:action="@{/ubigeos/{id}/eliminar(id=${ubigeo.id})}" class="acciones">
+            <button class="boton boton-eliminar" type="submit" th:if="${motivo == null}">Sí, eliminar</button>
+            <a class="boton-secundario" th:href="${ubigeo.padre != null} ? @{/ubigeos(padreId=${ubigeo.padre.id})} : @{/ubigeos}">Cancelar</a>
+        </form>
+    </section>
+</main>
+</body>
+</html>

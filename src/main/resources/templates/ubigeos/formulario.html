@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${ubigeo == null} ? 'Nuevo ubigeo' : 'Editar ubigeo')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('ubigeos')}"></div>
+<main class="contenedor" th:with="esEditar=${ubigeo != null}">
+    <p class="breadcrumb">
+        <a th:href="@{/ubigeos}">Ubigeos</a>
+        <th:block th:if="${padre != null}">
+            <th:block th:each="u : ${padre.ruta}"> / <a th:href="@{/ubigeos(padreId=${u.id})}" th:text="${u.nombre}"></a></th:block>
+        </th:block>
+        / <span th:text="${esEditar} ? 'Editar' : 'Nuevo'"></span>
+    </p>
+    <h1 th:text="${esEditar} ? 'Editar ' + ${ubigeo.nombre} : 'Nuevo ubigeo' + (${padre != null} ? ' en ' + ${padre.nombre} : '')"></h1>
+    <p class="subtitulo" th:if="${!esEditar}">El código sigue el ubigeo INEI: 2 dígitos el departamento, 4 la provincia y 6 el distrito.</p>
+    <p class="subtitulo" th:if="${esEditar}">El código y el nivel no se pueden cambiar. Un ubigeo inactivo no se puede elegir en sismos nuevos.</p>
+
+    <form method="post" th:object="${ubigeoForm}" novalidate class="formulario-corto"
+          th:action="${esEditar} ? @{/ubigeos/{id}(id=${ubigeo.id})} : @{/ubigeos}">
+        <div th:replace="~{fragments/layout :: erroresFormulario('guardar el ubigeo')}"></div>
+        <input type="hidden" th:field="*{padreId}">
+        <section class="tarjeta">
+            <div class="formulario-grid dos-columnas">
+                <label th:if="${!esEditar and padre == null}">
+                    <span class="campo-obligatorio">Tipo</span>
+                    <select th:field="*{tipo}" th:errorclass="campo-error">
+                        <option th:each="t : ${tiposRaiz}" th:value="${t.name()}" th:text="${t.nombre}"></option>
+                    </select>
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}"></span>
+                </label>
+                <label th:if="${esEditar or padre != null}">
+                    <span>Tipo</span>
+                    <input type="hidden" th:field="*{tipo}">
+                    <input th:value="${tipoActual?.nombre}" disabled>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Código de ubigeo</span>
+                    <input th:field="*{codigo}" maxlength="6" th:readonly="${esEditar}" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}"></span>
+                    <span class="ayuda" th:unless="${#fields.hasErrors('codigo')}"
+                          th:text="${padre != null} ? 'Debe empezar con ' + ${padre.codigo} + '.' : '2 dígitos. Ej. 04'"></span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Nombre</span>
+                    <input th:field="*{nombre}" maxlength="80" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Estado</span>
+                    <select th:field="*{estado}" th:errorclass="campo-error">
+                        <option value="ACTIVO">ACTIVO</option>
+                        <option value="INACTIVO">INACTIVO</option>
+                    </select>
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('estado')}" th:errors="*{estado}"></span>
+                </label>
+            </div>
+        </section>
+        <div class="acciones">
+            <button class="boton" type="submit" th:text="${esEditar} ? 'Guardar cambios' : 'Registrar'"></button>
+            <a class="boton-secundario" th:href="${padre != null} ? @{/ubigeos(padreId=${padre.id})} : @{/ubigeos}">Cancelar</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

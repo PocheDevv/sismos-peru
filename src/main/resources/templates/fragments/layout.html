@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Fragmentos comunes a todas las vistas -->
+<head th:fragment="head(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo} + ' | SismosPerú'">SismosPerú</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:fragment="barra(seccion)" class="barra-superior">
+    <span class="marca">SismosPerú <span>Sistema de Gestión de Sismos</span></span>
+    <nav class="menu">
+        <a th:href="@{/sismos}" th:classappend="${seccion == 'sismos'} ? 'activo'">Sismos</a>
+        <a th:href="@{/ubigeos}" th:classappend="${seccion == 'ubigeos'} ? 'activo'">Ubigeos</a>
+        <a th:href="@{/estaciones}" th:classappend="${seccion == 'estaciones'} ? 'activo'">Estaciones</a>
+        <a th:href="@{/tipos-alerta}" th:classappend="${seccion == 'alertas'} ? 'activo'">Tipos de alerta</a>
+        <a th:href="@{/tipos-dano}" th:classappend="${seccion == 'danos'} ? 'activo'">Tipos de daño</a>
+        <a th:href="@{/importacion}" th:classappend="${seccion == 'importacion'} ? 'activo'">Importar CSV</a>
+    </nav>
+</div>
+
+<!-- Mensajes de éxito o error que llegan después de redirigir (flash) -->
+<th:block th:fragment="mensajes">
+    <div class="alerta alerta-exito" th:if="${exito}" th:text="${exito}"></div>
+    <div class="alerta alerta-error" th:if="${error}" th:text="${error}"></div>
+</th:block>
+
+<!-- Resumen de errores de un formulario: ${#fields} usa el objeto del th:object que lo rodea -->
+<div th:fragment="erroresFormulario(accion)" class="alerta alerta-error" th:if="${#fields.hasAnyErrors()}">
+    <strong th:text="'No se pudo ' + ${accion} + '. Revise los siguientes datos:'"></strong>
+    <ul>
+        <li th:each="mensaje : ${#fields.allErrors()}" th:text="${mensaje}"></li>
+    </ul>
+</div>
+
+<!--
+  HU-21: selección de ubigeo en cascada (departamento → provincia → distrito).
+  Se incluye dentro de un formulario con th:object que tenga el campo ubigeoId.
+  Los datos vienen de ${ubigeosCascada} (solo ubigeos activos).
+-->
+<th:block th:fragment="cascadaUbigeo">
+    <label>
+        <span class="campo-obligatorio">Departamento</span>
+        <select id="cascada-1" th:classappend="${#fields.hasErrors('ubigeoId')} ? 'campo-error'"></select>
+    </label>
+    <label>
+        <span>Provincia</span>
+        <select id="cascada-2"></select>
+    </label>
+    <label>
+        <span>Distrito</span>
+        <select id="cascada-3"></select>
+        <span class="ayuda-error" th:if="${#fields.hasErrors('ubigeoId')}" th:errors="*{ubigeoId}"></span>
+        <span class="ayuda" th:unless="${#fields.hasErrors('ubigeoId')}">Elija el nivel más preciso disponible.</span>
+    </label>
+    <input type="hidden" id="ubigeoId" th:field="*{ubigeoId}">
+    <p class="ayuda ancho-completo" th:if="${ubigeoActual != null and !ubigeoActual.activo}"
+       th:text="'Ubigeo actual: ' + ${ubigeoActual.ubicacionCompleta} + ' (inactivo). Si lo cambia, ya no podrá volver a elegirlo.'"></p>
+    <script th:inline="javascript">
+        window.UBIGEOS = /*[[${ubigeosCascada}]]*/ [];
+        window.UBIGEO_ACTUAL = /*[[${ubigeoActual != null and !ubigeoActual.activo} ? ${ubigeoActual.id} : null]]*/ null;
+    </script>
+    <script th:src="@{/js/cascada-ubigeo.js}"></script>
+</th:block>
+
+</body>
+</html>

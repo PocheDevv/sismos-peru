@@ -1,0 +1,11 @@
+target/
+.idea/
+*.iml
+.vscode/
+.DS_Store
+.smarttomcat/
+nbactions.xml
+nb-configuration.xml
+
+# Configuración local con la contraseña de MySQL de cada integrante
+src/main/resources/application-local.properties
