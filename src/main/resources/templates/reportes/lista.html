@@ -23,12 +23,12 @@
                 <thead>
                 <tr>
                     <th>Sismo</th><th>Ubicación</th><th>Fecha del reporte</th><th>Tipo de daño</th>
-                    <th>Cantidad</th><th>Nivel</th><th>Estado</th><th>Descripción</th>
+                    <th>Cantidad</th><th>Nivel</th><th>Estado</th><th>Descripción</th><th>Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:if="${reportes.isEmpty()}">
-                    <td colspan="8" class="vacio">No hay reportes de afectación registrados.</td>
+                    <td colspan="9" class="vacio">No hay reportes de afectación registrados.</td>
                 </tr>
                 <tr th:each="r : ${reportes}">
                     <td><a th:href="@{/sismos/{id}(id=${r.sismo.id})}" th:text="${r.sismo.codigo}"></a></td>
@@ -39,6 +39,10 @@
                     <td><span th:class="${r.claseNivel}" th:text="${r.nivel}"></span></td>
                     <td><span th:class="${r.claseEstado}" th:text="${r.estado}"></span></td>
                     <td class="texto-largo" th:text="${r.descripcion}"></td>
+                    <td class="acciones-tabla">
+                        <a th:unless="${r.cerrado}" th:href="@{/sismos/{s}/reportes/{id}/editar(s=${r.sismo.id}, id=${r.id})}">Editar</a>
+                        <span th:if="${r.cerrado}" class="nota">Sin cambios</span>
+                    </td>
                 </tr>
                 </tbody>
             </table>
