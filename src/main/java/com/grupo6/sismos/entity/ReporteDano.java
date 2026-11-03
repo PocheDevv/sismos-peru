@@ -45,6 +45,18 @@ public class ReporteDano {
     @Column(nullable = false, length = 12)
     private String estado = ESTADO_PENDIENTE;
 
+    public String getClaseNivel() {
+        return "badge badge-nivel-" + (nivel == null ? "medio" : nivel.toLowerCase());
+    }
+
+    public String getClaseEstado() {
+        return switch (estado) {
+            case ESTADO_VERIFICADO -> "badge badge-activo";
+            case ESTADO_CERRADO -> "badge badge-cerrado";
+            default -> "badge badge-evaluacion";
+        };
+    }
+
     public Long getId() {
         return id;
     }

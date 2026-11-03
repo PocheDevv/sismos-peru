@@ -7,6 +7,7 @@ import com.grupo6.sismos.service.TipoDanoService;
 import com.grupo6.sismos.web.error.ReglaNegocioException;
 import com.grupo6.sismos.web.form.ReporteDanoForm;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/sismos/{sismoId}/reportes")
 public class ReporteDanoController {
 
     private final ReporteDanoService reporteDanoService;
@@ -25,7 +25,16 @@ public class ReporteDanoController {
         this.tipoDanoService = tipoDanoService;
     }
 
-    @GetMapping("/nuevo")
+    @GetMapping("/reportes")
+    public String listar(@RequestParam(required = false) String pagina, Model model) {
+        Integer numero = pagina != null && pagina.matches("\\d{1,6}") ? Integer.valueOf(pagina) : null;
+        Page<ReporteDano> resultado = reporteDanoService.listar(numero);
+        model.addAttribute("pagina", resultado);
+        model.addAttribute("reportes", resultado.getContent());
+        return "reportes/lista";
+    }
+
+    @GetMapping("/sismos/{sismoId}/reportes/nuevo")
     public String nuevo(@PathVariable Long sismoId, Model model, RedirectAttributes redirect) {
         Sismo sismo = reporteDanoService.buscarSismo(sismoId);
         String motivo = reporteDanoService.motivoParaNoReportar(sismo);
@@ -37,7 +46,7 @@ public class ReporteDanoController {
         return "reportes/formulario";
     }
 
-    @PostMapping
+    @PostMapping("/sismos/{sismoId}/reportes")
     public String registrar(@PathVariable Long sismoId, @Valid @ModelAttribute("reporteForm") ReporteDanoForm form,
                             BindingResult errores, Model model, RedirectAttributes redirect) {
         Sismo sismo = reporteDanoService.buscarSismo(sismoId);

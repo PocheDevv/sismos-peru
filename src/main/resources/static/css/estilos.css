@@ -121,6 +121,13 @@ th a:hover { color: #111827; }
 .formulario-grid textarea { padding: 9px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; font-family: inherit; }
 .formulario-grid .ancho-completo { grid-column: 1 / -1; }
 
+.badge-nivel-bajo { background: #ecfdf5; color: #065f46; }
+.badge-nivel-medio { background: #fef3c7; color: #92400e; }
+.badge-nivel-alto { background: #ffedd5; color: #9a3412; }
+.badge-nivel-critico { background: #fee2e2; color: #991b1b; }
+.tabla-scroll td.texto-largo { white-space: normal; min-width: 220px; }
+.tabla-scroll td.texto-ajustable { white-space: normal; min-width: 140px; }
+
 /* Importación CSV */
 .columnas-esperadas { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #374151; }
 .cifras { display: flex; gap: 28px; margin-bottom: 14px; }
