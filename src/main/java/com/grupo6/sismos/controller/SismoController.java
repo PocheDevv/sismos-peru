@@ -2,6 +2,7 @@ package com.grupo6.sismos.controller;
 
 import com.grupo6.sismos.entity.Sismo;
 import com.grupo6.sismos.service.EstacionService;
+import com.grupo6.sismos.service.ReporteDanoService;
 import com.grupo6.sismos.service.SismoService;
 import com.grupo6.sismos.service.TipoAlertaService;
 import com.grupo6.sismos.service.UbigeoService;
@@ -25,13 +26,16 @@ public class SismoController {
     private final UbigeoService ubigeoService;
     private final TipoAlertaService tipoAlertaService;
     private final EstacionService estacionService;
+    private final ReporteDanoService reporteDanoService;
 
     public SismoController(SismoService sismoService, UbigeoService ubigeoService,
-                           TipoAlertaService tipoAlertaService, EstacionService estacionService) {
+                           TipoAlertaService tipoAlertaService, EstacionService estacionService,
+                           ReporteDanoService reporteDanoService) {
         this.sismoService = sismoService;
         this.ubigeoService = ubigeoService;
         this.tipoAlertaService = tipoAlertaService;
         this.estacionService = estacionService;
+        this.reporteDanoService = reporteDanoService;
     }
 
     @GetMapping
@@ -73,6 +77,7 @@ public class SismoController {
     @GetMapping("/{id}")
     public String detalle(@PathVariable Long id, Model model) {
         model.addAttribute("sismo", sismoService.buscarPorId(id));
+        model.addAttribute("reportes", reporteDanoService.listarPorSismo(id));
         return "sismos/detalle";
     }
 
