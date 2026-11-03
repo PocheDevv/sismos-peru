@@ -11,11 +11,17 @@ import com.grupo6.sismos.web.error.ReglaNegocioException;
 import com.grupo6.sismos.web.form.ReporteDanoForm;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ReporteDanoService {
+
+    public static final int TAMANIO_PAGINA = 10;
 
     private final ReporteDanoRepository reporteDanoRepository;
     private final SismoRepository sismoRepository;
@@ -32,6 +38,25 @@ public class ReporteDanoService {
     public Sismo buscarSismo(Long sismoId) {
         return sismoRepository.findById(sismoId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("No existe el sismo solicitado."));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReporteDano> listarPorSismo(Long sismoId) {
+        return reporteDanoRepository.findBySismoIdOrderByFechaReporteDesc(sismoId);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ReporteDano> listar(Integer pagina) {
+        int numero = pagina == null || pagina < 1 ? 1 : pagina;
+        Page<ReporteDano> resultado = reporteDanoRepository.findAll(paginaDeReportes(numero));
+        if (resultado.getTotalPages() > 0 && numero > resultado.getTotalPages()) {
+            resultado = reporteDanoRepository.findAll(paginaDeReportes(resultado.getTotalPages()));
+        }
+        return resultado;
+    }
+
+    private PageRequest paginaDeReportes(int numero) {
+        return PageRequest.of(numero - 1, TAMANIO_PAGINA, Sort.by(Sort.Direction.DESC, "fechaReporte", "id"));
     }
 
     public String motivoParaNoReportar(Sismo sismo) {

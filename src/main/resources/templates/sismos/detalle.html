@@ -14,7 +14,6 @@
                 </div>
                 <div class="acciones">
                     <a class="boton" th:href="@{/sismos/{id}/editar(id=${sismo.id})}">Editar</a>
-                    <a class="boton-secundario" th:href="@{/sismos/{id}/reportes/nuevo(id=${sismo.id})}">+ Reporte de afectación</a>
                     <a class="boton-peligro" th:href="@{/sismos/{id}/eliminar(id=${sismo.id})}">Eliminar</a>
                     <a class="boton-secundario" th:href="@{/sismos}">Volver a la lista</a>
                 </div>
@@ -39,6 +38,36 @@
                         <div class="valor"><span th:text="${u.nombre}"></span> <span class="nota" th:text="'(ubigeo ' + ${u.codigo} + ')'"></span></div>
                     </div>
                     <div><div class="etiqueta">Referencia</div><div class="valor" th:text="${sismo.referencia} ?: '—'"></div></div>
+                </div>
+            </section>
+
+            <section class="tarjeta">
+                <div class="barra-resultados">
+                    <h2 class="titulo-tarjeta" th:text="'Reportes de afectación (' + ${reportes.size()} + ')'"></h2>
+                    <a class="boton-secundario" th:href="@{/sismos/{id}/reportes/nuevo(id=${sismo.id})}">+ Reporte de afectación</a>
+                </div>
+                <div class="tabla-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha del reporte</th><th>Tipo de daño</th><th>Cantidad</th>
+                                <th>Nivel</th><th>Estado</th><th>Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${reportes.isEmpty()}">
+                                <td colspan="6" class="vacio">Este sismo no tiene reportes de afectación registrados.</td>
+                            </tr>
+                            <tr th:each="r : ${reportes}">
+                                <td th:text="${#temporals.format(r.fechaReporte, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td th:text="${r.tipoDano.nombre}"></td>
+                                <td th:text="${#numbers.formatInteger(r.cantidadAfectada, 1, 'COMMA')}"></td>
+                                <td><span th:class="${r.claseNivel}" th:text="${r.nivel}"></span></td>
+                                <td><span th:class="${r.claseEstado}" th:text="${r.estado}"></span></td>
+                                <td class="texto-largo" th:text="${r.descripcion}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </section>
 

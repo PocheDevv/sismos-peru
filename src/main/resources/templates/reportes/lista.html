@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Reportes de afectación')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('reportes')}"></div>
+<main class="contenedor">
+    <div class="encabezado">
+        <div>
+            <h1>Reportes de afectación</h1>
+            <p class="subtitulo">Daños reportados en todos los sismos, del más reciente al más antiguo. Para registrar uno, entre al detalle del sismo.</p>
+        </div>
+    </div>
+    <th:block th:replace="~{fragments/layout :: mensajes}"></th:block>
+
+    <section class="tarjeta">
+        <div class="barra-resultados">
+            <span th:if="${pagina.totalElements > 0}"
+                  th:text="'Mostrando ' + ${pagina.number * pagina.size + 1} + '–' + ${pagina.number * pagina.size + pagina.numberOfElements} + ' de ' + ${pagina.totalElements} + ' reporte(s)'"></span>
+            <span th:if="${pagina.totalElements == 0}">0 reportes</span>
+        </div>
+        <div class="tabla-scroll">
+            <table>
+                <thead>
+                <tr>
+                    <th>Sismo</th><th>Ubicación</th><th>Fecha del reporte</th><th>Tipo de daño</th>
+                    <th>Cantidad</th><th>Nivel</th><th>Estado</th><th>Descripción</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${reportes.isEmpty()}">
+                    <td colspan="8" class="vacio">No hay reportes de afectación registrados.</td>
+                </tr>
+                <tr th:each="r : ${reportes}">
+                    <td><a th:href="@{/sismos/{id}(id=${r.sismo.id})}" th:text="${r.sismo.codigo}"></a></td>
+                    <td class="texto-ajustable" th:text="${r.sismo.ubigeo.ubicacionCompleta}"></td>
+                    <td th:text="${#temporals.format(r.fechaReporte, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td th:text="${r.tipoDano.nombre}"></td>
+                    <td th:text="${#numbers.formatInteger(r.cantidadAfectada, 1, 'COMMA')}"></td>
+                    <td><span th:class="${r.claseNivel}" th:text="${r.nivel}"></span></td>
+                    <td><span th:class="${r.claseEstado}" th:text="${r.estado}"></span></td>
+                    <td class="texto-largo" th:text="${r.descripcion}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <nav class="paginacion" th:if="${pagina.totalPages > 1}">
+            <a th:if="${pagina.hasPrevious()}" th:href="@{/reportes(pagina=${pagina.number})}">‹ Anterior</a>
+            <span th:unless="${pagina.hasPrevious()}" class="deshabilitado">‹ Anterior</span>
+            <th:block th:each="n : ${#numbers.sequence(1, pagina.totalPages)}">
+                <span th:if="${n == pagina.number + 1}" class="actual" th:text="${n}"></span>
+                <a th:unless="${n == pagina.number + 1}" th:href="@{/reportes(pagina=${n})}" th:text="${n}"></a>
+            </th:block>
+            <a th:if="${pagina.hasNext()}" th:href="@{/reportes(pagina=${pagina.number + 2})}">Siguiente ›</a>
+            <span th:unless="${pagina.hasNext()}" class="deshabilitado">Siguiente ›</span>
+        </nav>
+    </section>
+</main>
+</body>
+</html>

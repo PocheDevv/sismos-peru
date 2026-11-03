@@ -13,6 +13,7 @@
     <span class="marca">SismosPerú <span>Sistema de Gestión de Sismos</span></span>
     <nav class="menu">
         <a th:href="@{/sismos}" th:classappend="${seccion == 'sismos'} ? 'activo'">Sismos</a>
+        <a th:href="@{/reportes}" th:classappend="${seccion == 'reportes'} ? 'activo'">Reportes</a>
         <a th:href="@{/ubigeos}" th:classappend="${seccion == 'ubigeos'} ? 'activo'">Ubigeos</a>
         <a th:href="@{/estaciones}" th:classappend="${seccion == 'estaciones'} ? 'activo'">Estaciones</a>
         <a th:href="@{/tipos-alerta}" th:classappend="${seccion == 'alertas'} ? 'activo'">Tipos de alerta</a>
