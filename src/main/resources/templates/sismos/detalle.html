@@ -1,47 +1,48 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Sismo ' + ${sismo.codigo})}"></head>
-<body>
-<div th:replace="~{fragments/layout :: barra('sismos')}"></div>
-<main class="contenedor">
-    <p class="breadcrumb"><a th:href="@{/sismos}">Sismos</a> / <span th:text="${sismo.codigo}"></span></p>
-    <th:block th:replace="~{fragments/layout :: mensajes}"></th:block>
+    <head th:replace="~{fragments/layout :: head('Sismo ' + ${sismo.codigo})}"></head>
+    <body>
+        <div th:replace="~{fragments/layout :: barra('sismos')}"></div>
+        <main class="contenedor">
+            <p class="breadcrumb"><a th:href="@{/sismos}">Sismos</a> / <span th:text="${sismo.codigo}"></span></p>
+            <th:block th:replace="~{fragments/layout :: mensajes}"></th:block>
 
-    <div class="encabezado">
-        <div>
-            <h1>Sismo <span th:text="${sismo.codigo}"></span> <span th:class="${sismo.claseEstado}" th:text="${sismo.estado}"></span></h1>
-            <p class="subtitulo" th:text="${sismo.ubigeo.ubicacionCompleta}"></p>
-        </div>
-        <div class="acciones">
-            <a class="boton" th:href="@{/sismos/{id}/editar(id=${sismo.id})}">Editar</a>
-            <a class="boton-peligro" th:href="@{/sismos/{id}/eliminar(id=${sismo.id})}">Eliminar</a>
-            <a class="boton-secundario" th:href="@{/sismos}">Volver a la lista</a>
-        </div>
-    </div>
-
-    <section class="tarjeta">
-        <div class="detalle-grid">
-            <div><div class="etiqueta">Código</div><div class="valor" th:text="${sismo.codigo}"></div></div>
-            <div><div class="etiqueta">Fecha y hora</div><div class="valor" th:text="${#temporals.format(sismo.fechaHora, 'dd/MM/yyyy HH:mm')}"></div></div>
-            <div><div class="etiqueta">Alerta</div><div class="valor"><span th:class="${sismo.tipoAlerta.claseColor}" th:text="${sismo.tipoAlerta.nombre} + ' (' + ${sismo.tipoAlerta.codigo} + ')'"></span></div></div>
-
-            <div><div class="etiqueta">Magnitud</div><div class="valor" th:text="'M ' + ${#numbers.formatDecimal(sismo.magnitud, 1, 1)}"></div></div>
-            <div><div class="etiqueta">Profundidad</div><div class="valor" th:text="${#numbers.formatDecimal(sismo.profundidad, 1, 1)} + ' km'"></div></div>
-            <div><div class="etiqueta">Intensidad</div><div class="valor" th:text="${sismo.intensidad} ?: '—'"></div></div>
-
-            <div><div class="etiqueta">Latitud</div><div class="valor" th:text="${sismo.latitud}"></div></div>
-            <div><div class="etiqueta">Longitud</div><div class="valor" th:text="${sismo.longitud}"></div></div>
-            <div><div class="etiqueta">Estación</div><div class="valor" th:text="${sismo.estacion != null} ? ${sismo.estacion.codigo} + ' · ' + ${sismo.estacion.nombre} : 'Sin estación'"></div></div>
-
-            <div th:each="u : ${sismo.ubigeo.ruta}">
-                <div class="etiqueta" th:text="${u.tipo.nombre}"></div>
-                <div class="valor"><span th:text="${u.nombre}"></span> <span class="nota" th:text="'(ubigeo ' + ${u.codigo} + ')'"></span></div>
+            <div class="encabezado">
+                <div>
+                    <h1>Sismo <span th:text="${sismo.codigo}"></span> <span th:class="${sismo.claseEstado}" th:text="${sismo.estado}"></span></h1>
+                    <p class="subtitulo" th:text="${sismo.ubigeo.ubicacionCompleta}"></p>
+                </div>
+                <div class="acciones">
+                    <a class="boton" th:href="@{/sismos/{id}/editar(id=${sismo.id})}">Editar</a>
+                    <a class="boton-secundario" th:href="@{/sismos/{id}/reportes/nuevo(id=${sismo.id})}">+ Reporte de afectación</a>
+                    <a class="boton-peligro" th:href="@{/sismos/{id}/eliminar(id=${sismo.id})}">Eliminar</a>
+                    <a class="boton-secundario" th:href="@{/sismos}">Volver a la lista</a>
+                </div>
             </div>
-            <div><div class="etiqueta">Referencia</div><div class="valor" th:text="${sismo.referencia} ?: '—'"></div></div>
-        </div>
-    </section>
 
-    <!-- Sprint 3: aquí van los reportes de daño del sismo (HU-12, HU-13, HU-28) y su seguimiento (HU-29, HU-14). -->
-</main>
-</body>
+            <section class="tarjeta">
+                <div class="detalle-grid">
+                    <div><div class="etiqueta">Código</div><div class="valor" th:text="${sismo.codigo}"></div></div>
+                    <div><div class="etiqueta">Fecha y hora</div><div class="valor" th:text="${#temporals.format(sismo.fechaHora, 'dd/MM/yyyy HH:mm')}"></div></div>
+                    <div><div class="etiqueta">Alerta</div><div class="valor"><span th:class="${sismo.tipoAlerta.claseColor}" th:text="${sismo.tipoAlerta.nombre} + ' (' + ${sismo.tipoAlerta.codigo} + ')'"></span></div></div>
+
+                    <div><div class="etiqueta">Magnitud</div><div class="valor" th:text="'M ' + ${#numbers.formatDecimal(sismo.magnitud, 1, 1)}"></div></div>
+                    <div><div class="etiqueta">Profundidad</div><div class="valor" th:text="${#numbers.formatDecimal(sismo.profundidad, 1, 1)} + ' km'"></div></div>
+                    <div><div class="etiqueta">Intensidad</div><div class="valor" th:text="${sismo.intensidad} ?: '—'"></div></div>
+
+                    <div><div class="etiqueta">Latitud</div><div class="valor" th:text="${sismo.latitud}"></div></div>
+                    <div><div class="etiqueta">Longitud</div><div class="valor" th:text="${sismo.longitud}"></div></div>
+                    <div><div class="etiqueta">Estación</div><div class="valor" th:text="${sismo.estacion != null} ? ${sismo.estacion.codigo} + ' · ' + ${sismo.estacion.nombre} : 'Sin estación'"></div></div>
+
+                    <div th:each="u : ${sismo.ubigeo.ruta}">
+                        <div class="etiqueta" th:text="${u.tipo.nombre}"></div>
+                        <div class="valor"><span th:text="${u.nombre}"></span> <span class="nota" th:text="'(ubigeo ' + ${u.codigo} + ')'"></span></div>
+                    </div>
+                    <div><div class="etiqueta">Referencia</div><div class="valor" th:text="${sismo.referencia} ?: '—'"></div></div>
+                </div>
+            </section>
+
+            <!-- Sprint 3: aquí van los reportes de daño del sismo (HU-12, HU-13, HU-28) y su seguimiento (HU-29, HU-14). -->
+        </main>
+    </body>
 </html>
