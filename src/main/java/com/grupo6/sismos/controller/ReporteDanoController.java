@@ -41,6 +41,12 @@ public class ReporteDanoController {
     public String registrar(@PathVariable Long sismoId, @Valid @ModelAttribute("reporteForm") ReporteDanoForm form,
                             BindingResult errores, Model model, RedirectAttributes redirect) {
         Sismo sismo = reporteDanoService.buscarSismo(sismoId);
+        if (!errores.hasFieldErrors("fechaReporte")) {
+            String errorFecha = reporteDanoService.errorFechaReporte(sismo, form.getFechaReporte());
+            if (errorFecha != null) {
+                errores.rejectValue("fechaReporte", "regla", errorFecha);
+            }
+        }
         if (!errores.hasErrors()) {
             try {
                 ReporteDano reporte = reporteDanoService.registrar(sismoId, form);

@@ -41,6 +41,13 @@ public class ReporteDanoService {
         return null;
     }
 
+    public String errorFechaReporte(Sismo sismo, LocalDateTime fechaReporte) {
+        if (fechaReporte != null && fechaReporte.isBefore(sismo.getFechaHora())) {
+            return "La fecha del reporte no puede ser anterior a la ocurrencia del sismo.";
+        }
+        return null;
+    }
+
     public ReporteDanoForm formNuevo() {
         ReporteDanoForm form = new ReporteDanoForm();
         form.setFechaReporte(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
@@ -72,9 +79,9 @@ public class ReporteDanoService {
         if (!ReporteDano.NIVELES.contains(form.getNivel())) {
             throw new ReglaNegocioException("nivel", "Seleccione un nivel de afectación válido.");
         }
-        if (form.getFechaReporte().isBefore(reporte.getSismo().getFechaHora())) {
-            throw new ReglaNegocioException("fechaReporte",
-                    "La fecha del reporte no puede ser anterior a la ocurrencia del sismo.");
+        String errorFecha = errorFechaReporte(reporte.getSismo(), form.getFechaReporte());
+        if (errorFecha != null) {
+            throw new ReglaNegocioException("fechaReporte", errorFecha);
         }
         reporte.setTipoDano(tipo);
         reporte.setFechaReporte(form.getFechaReporte());
