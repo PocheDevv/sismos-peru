@@ -35,15 +35,16 @@
                 </label>
                 <label>
                     <span class="campo-obligatorio">Fecha y hora del reporte</span>
-                    <input type="datetime-local" th:field="*{fechaReporte}" th:errorclass="campo-error">
+                    <input type="datetime-local" th:field="*{fechaReporte}" th:errorclass="campo-error"
+                           th:min="${#temporals.format(sismo.fechaHora, 'yyyy-MM-dd''T''HH:mm')}">
                     <span class="ayuda-error" th:if="${#fields.hasErrors('fechaReporte')}" th:errors="*{fechaReporte}"></span>
                     <span class="ayuda" th:unless="${#fields.hasErrors('fechaReporte')}">Entre la ocurrencia del sismo y el momento actual.</span>
                 </label>
                 <label>
                     <span class="campo-obligatorio">Cantidad afectada</span>
-                    <input type="number" min="0" step="1" th:field="*{cantidadAfectada}" th:errorclass="campo-error">
+                    <input type="number" min="1" step="1" th:field="*{cantidadAfectada}" th:errorclass="campo-error">
                     <span class="ayuda-error" th:if="${#fields.hasErrors('cantidadAfectada')}" th:errors="*{cantidadAfectada}"></span>
-                    <span class="ayuda" th:unless="${#fields.hasErrors('cantidadAfectada')}">Viviendas, personas o elementos afectados.</span>
+                    <span class="ayuda" th:unless="${#fields.hasErrors('cantidadAfectada')}">Mayor que cero: viviendas, personas o elementos afectados.</span>
                 </label>
                 <label>
                     <span class="campo-obligatorio">Nivel de afectación</span>

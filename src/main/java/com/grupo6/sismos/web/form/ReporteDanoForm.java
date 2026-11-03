@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,7 +20,7 @@ public class ReporteDanoForm {
     private LocalDateTime fechaReporte;
 
     @NotNull(message = "La cantidad afectada es obligatoria.")
-    @PositiveOrZero(message = "La cantidad afectada no puede ser negativa.")
+    @Positive(message = "La cantidad afectada debe ser mayor que cero.")
     @Max(value = 10000000, message = "La cantidad afectada no puede superar 10 000 000.")
     private Integer cantidadAfectada;
 
