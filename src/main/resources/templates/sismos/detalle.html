@@ -63,7 +63,15 @@
                                 <td th:text="${r.tipoDano.nombre}"></td>
                                 <td th:text="${#numbers.formatInteger(r.cantidadAfectada, 1, 'COMMA')}"></td>
                                 <td><span th:class="${r.claseNivel}" th:text="${r.nivel}"></span></td>
-                                <td><span th:class="${r.claseEstado}" th:text="${r.estado}"></span></td>
+                                <td>
+                                    <form th:action="@{/sismos/{sId}/reportes/{rId}/estado(sId=${sismo.id}, rId=${r.id})}" method="post">
+                                        <select name="estado" class="form-select form-select-sm" onchange="this.form.submit()">
+                                            <option value="PENDIENTE" th:selected="${r.estado == 'PENDIENTE'}">PENDIENTE</option>
+                                            <option value="VERIFICADO" th:selected="${r.estado == 'VERIFICADO'}">VERIFICADO</option>
+                                            <option value="CERRADO" th:selected="${r.estado == 'CERRADO'}">CERRADO</option>
+                                        </select>
+                                    </form>
+                                </td>
                                 <td class="texto-largo" th:text="${r.descripcion}"></td>
                                 <td class="acciones-tabla">
                                     <a th:unless="${r.cerrado}" th:href="@{/sismos/{s}/reportes/{id}/editar(s=${sismo.id}, id=${r.id})}">Editar</a>
