@@ -53,6 +53,12 @@ public class ReporteDanoService {
     }
 
     @Transactional(readOnly = true)
+    public Long totalAfectadosPorSismo(Long sismoId) {
+        Long total = reporteDanoRepository.sumarCantidadAfectadaPorSismo(sismoId);
+        return total == null ? 0L : total;
+    }
+
+    @Transactional(readOnly = true)
     public Page<ReporteDano> listar(Integer pagina) {
         int numero = pagina == null || pagina < 1 ? 1 : pagina;
         Page<ReporteDano> resultado = reporteDanoRepository.findAll(paginaDeReportes(numero));
