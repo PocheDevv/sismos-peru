@@ -101,6 +101,19 @@ public class ReporteDanoController {
         cargarFormulario(model, form, reporte.getSismo(), reporte);
         return "reportes/formulario";
     }
+    
+    @PostMapping("/sismos/{sismoId}/reportes/{id}/estado")
+    public String cambiarEstado(@PathVariable Long sismoId, @PathVariable Long id,
+                                @RequestParam("estado") String nuevoEstado,
+                                RedirectAttributes redirect) {
+        try {
+            reporteDanoService.actualizarEstado(sismoId, id, nuevoEstado);
+            redirect.addFlashAttribute("exito", "El estado del reporte de afectación se actualizó correctamente.");
+        } catch (ReglaNegocioException error) {
+            redirect.addFlashAttribute("error", error.getMessage());
+        }
+        return "redirect:/sismos/" + sismoId;
+    }
 
     private void validarFecha(Sismo sismo, ReporteDanoForm form, BindingResult errores) {
         if (!errores.hasFieldErrors("fechaReporte")) {
@@ -121,5 +134,6 @@ public class ReporteDanoController {
         model.addAttribute("reporte", reporte);
         model.addAttribute("tiposDano", tiposDano);
         model.addAttribute("niveles", ReporteDano.NIVELES);
+        model.addAttribute("estados", List.of("PENDIENTE", "VERIFICADO", "CERRADO"));
     }
 }

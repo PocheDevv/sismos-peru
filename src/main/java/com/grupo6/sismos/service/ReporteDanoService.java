@@ -80,6 +80,7 @@ public class ReporteDanoService {
         }
         return resultado;
     }
+    
 
     private Long validarTipoDano(ReporteDanoFiltro filtro) {
         String valor = filtro.getTipoDanoId();
@@ -199,6 +200,7 @@ public class ReporteDanoService {
         form.setCantidadAfectada(reporte.getCantidadAfectada());
         form.setDescripcion(reporte.getDescripcion());
         form.setNivel(reporte.getNivel());
+        form.setEstado(reporte.getEstado());
         return form;
     }
 
@@ -213,6 +215,9 @@ public class ReporteDanoService {
         if (!ReporteDano.NIVELES.contains(form.getNivel())) {
             throw new ReglaNegocioException("nivel", "Seleccione un nivel de afectación válido.");
         }
+        if (!ReporteDano.ESTADOS.contains(form.getEstado())) {
+        throw new ReglaNegocioException("estado", "Seleccione un estado válido.");
+        }
         String errorFecha = errorFechaReporte(reporte.getSismo(), form.getFechaReporte());
         if (errorFecha != null) {
             throw new ReglaNegocioException("fechaReporte", errorFecha);
@@ -222,5 +227,18 @@ public class ReporteDanoService {
         reporte.setCantidadAfectada(form.getCantidadAfectada());
         reporte.setDescripcion(form.getDescripcion().trim());
         reporte.setNivel(form.getNivel());
+        reporte.setEstado(form.getEstado());
+    }
+    
+    @Transactional
+    public void actualizarEstado(Long sismoId, Long id, String nuevoEstado) {
+        ReporteDano reporte = buscarReporte(sismoId, id);
+        
+        if (!ReporteDano.ESTADOS.contains(nuevoEstado)) {
+            throw new ReglaNegocioException("estado", "El estado seleccionado no es válido.");
+        }
+        
+        reporte.setEstado(nuevoEstado);
+        reporteDanoRepository.save(reporte);
     }
 }

@@ -55,9 +55,11 @@
                     <span class="ayuda-error" th:if="${#fields.hasErrors('nivel')}" th:errors="*{nivel}"></span>
                 </label>
                 <label>
-                    <span>Estado</span>
-                    <input th:value="${esEditar} ? ${reporte.estado} : 'PENDIENTE'" disabled>
-                    <span class="ayuda" th:text="${esEditar} ? 'El estado no se modifica desde aquí.' : 'Se asigna automáticamente al registrar.'"></span>
+                    <span class="campo-obligatorio">Estado</span>
+                    <select th:field="*{estado}" th:errorclass="campo-error">
+                        <option th:each="e : ${estados}" th:value="${e}" th:text="${e}"></option>
+                    </select>
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('estado')}" th:errors="*{estado}"></span>
                 </label>
                 <label class="ancho-completo">
                     <span class="campo-obligatorio">Descripción</span>

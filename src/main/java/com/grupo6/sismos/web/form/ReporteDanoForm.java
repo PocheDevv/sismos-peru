@@ -30,6 +30,9 @@ public class ReporteDanoForm {
 
     @NotBlank(message = "Seleccione el nivel de afectación.")
     private String nivel = "MEDIO";
+    
+    @NotBlank(message = "Seleccione el estado.")
+    private String estado = "PENDIENTE";
 
     public Long getTipoDanoId() {
         return tipoDanoId;
@@ -69,5 +72,13 @@ public class ReporteDanoForm {
 
     public void setNivel(String nivel) {
         this.nivel = nivel;
+    }
+    
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }
