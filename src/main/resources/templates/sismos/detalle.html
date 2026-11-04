@@ -46,6 +46,8 @@
                     <h2 class="titulo-tarjeta" th:text="'Reportes de afectación (' + ${reportes.size()} + ')'"></h2>
                     <a class="boton-secundario" th:href="@{/sismos/{id}/reportes/nuevo(id=${sismo.id})}">+ Reporte de afectación</a>
                 </div>
+                <div class="etiqueta">Total acumulado de personas afectadas estimadas</div>
+                <div class="valor" th:text="${#numbers.formatInteger(totalAfectados, 1, 'COMMA')}"></div>
                 <div class="tabla-scroll">
                     <table>
                         <thead>
