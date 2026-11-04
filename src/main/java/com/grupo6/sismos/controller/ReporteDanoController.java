@@ -6,6 +6,7 @@ import com.grupo6.sismos.entity.TipoDano;
 import com.grupo6.sismos.service.ReporteDanoService;
 import com.grupo6.sismos.service.TipoDanoService;
 import com.grupo6.sismos.web.error.ReglaNegocioException;
+import com.grupo6.sismos.web.form.ReporteDanoFiltro;
 import com.grupo6.sismos.web.form.ReporteDanoForm;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
@@ -29,11 +30,13 @@ public class ReporteDanoController {
     }
 
     @GetMapping("/reportes")
-    public String listar(@RequestParam(required = false) String pagina, Model model) {
-        Integer numero = pagina != null && pagina.matches("\\d{1,6}") ? Integer.valueOf(pagina) : null;
-        Page<ReporteDano> resultado = reporteDanoService.listar(numero);
+    public String listar(@ModelAttribute("filtro") ReporteDanoFiltro filtro, Model model) {
+        Page<ReporteDano> resultado = reporteDanoService.listar(filtro);
         model.addAttribute("pagina", resultado);
         model.addAttribute("reportes", resultado.getContent());
+        model.addAttribute("tiposDano", tipoDanoService.listar());
+        model.addAttribute("niveles", ReporteDano.NIVELES);
+        model.addAttribute("estados", ReporteDano.ESTADOS);
         return "reportes/lista";
     }
 
