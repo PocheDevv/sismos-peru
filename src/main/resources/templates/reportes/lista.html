@@ -11,6 +11,43 @@
         </div>
     </div>
     <th:block th:replace="~{fragments/layout :: mensajes}"></th:block>
+    <div class="alerta alerta-error" th:if="${!filtro.avisos.isEmpty()}">
+        <div th:each="aviso : ${filtro.avisos}" th:text="${aviso}"></div>
+    </div>
+
+    <section class="tarjeta">
+        <form method="get" th:action="@{/reportes}" class="filtros">
+            <label>
+                <span>Tipo de afectación</span>
+                <select name="tipoDanoId">
+                    <option value="">Todos</option>
+                    <option th:each="tipo : ${tiposDano}" th:value="${tipo.id}"
+                            th:text="${tipo.nombre} + (${tipo.activo} ? '' : ' (inactivo)')"
+                            th:selected="${tipo.id.toString() == filtro.tipoDanoId}"></option>
+                </select>
+            </label>
+            <label>
+                <span>Nivel</span>
+                <select name="nivel">
+                    <option value="">Todos</option>
+                    <option th:each="n : ${niveles}" th:value="${n}" th:text="${n}"
+                            th:selected="${n == filtro.nivel}"></option>
+                </select>
+            </label>
+            <label>
+                <span>Estado</span>
+                <select name="estado">
+                    <option value="">Todos</option>
+                    <option th:each="e : ${estados}" th:value="${e}" th:text="${e}"
+                            th:selected="${e == filtro.estado}"></option>
+                </select>
+            </label>
+            <div class="acciones">
+                <button class="boton" type="submit">Filtrar</button>
+                <a class="boton-secundario" th:href="@{/reportes}">Limpiar</a>
+            </div>
+        </form>
+    </section>
 
     <section class="tarjeta">
         <div class="barra-resultados">
@@ -28,7 +65,8 @@
                 </thead>
                 <tbody>
                 <tr th:if="${reportes.isEmpty()}">
-                    <td colspan="9" class="vacio">No hay reportes de afectación registrados.</td>
+                    <td colspan="9" class="vacio"
+                        th:text="${filtro.tieneFiltros} ? 'Ningún reporte cumple los filtros indicados.' : 'No hay reportes de afectación registrados.'"></td>
                 </tr>
                 <tr th:each="r : ${reportes}">
                     <td><a th:href="@{/sismos/{id}(id=${r.sismo.id})}" th:text="${r.sismo.codigo}"></a></td>
@@ -49,13 +87,13 @@
         </div>
 
         <nav class="paginacion" th:if="${pagina.totalPages > 1}">
-            <a th:if="${pagina.hasPrevious()}" th:href="@{/reportes(pagina=${pagina.number})}">‹ Anterior</a>
+            <a th:if="${pagina.hasPrevious()}" th:href="@{${filtro.urlPagina(pagina.number)}}">‹ Anterior</a>
             <span th:unless="${pagina.hasPrevious()}" class="deshabilitado">‹ Anterior</span>
             <th:block th:each="n : ${#numbers.sequence(1, pagina.totalPages)}">
                 <span th:if="${n == pagina.number + 1}" class="actual" th:text="${n}"></span>
-                <a th:unless="${n == pagina.number + 1}" th:href="@{/reportes(pagina=${n})}" th:text="${n}"></a>
+                <a th:unless="${n == pagina.number + 1}" th:href="@{${filtro.urlPagina(n)}}" th:text="${n}"></a>
             </th:block>
-            <a th:if="${pagina.hasNext()}" th:href="@{/reportes(pagina=${pagina.number + 2})}">Siguiente ›</a>
+            <a th:if="${pagina.hasNext()}" th:href="@{${filtro.urlPagina(pagina.number + 2)}}">Siguiente ›</a>
             <span th:unless="${pagina.hasNext()}" class="deshabilitado">Siguiente ›</span>
         </nav>
     </section>

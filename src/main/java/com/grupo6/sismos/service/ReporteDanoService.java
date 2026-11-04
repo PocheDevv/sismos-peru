@@ -8,10 +8,12 @@ import com.grupo6.sismos.repository.SismoRepository;
 import com.grupo6.sismos.repository.TipoDanoRepository;
 import com.grupo6.sismos.web.error.RecursoNoEncontradoException;
 import com.grupo6.sismos.web.error.ReglaNegocioException;
+import com.grupo6.sismos.web.form.ReporteDanoFiltro;
 import com.grupo6.sismos.web.form.ReporteDanoForm;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Locale;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -59,13 +61,79 @@ public class ReporteDanoService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ReporteDano> listar(Integer pagina) {
-        int numero = pagina == null || pagina < 1 ? 1 : pagina;
-        Page<ReporteDano> resultado = reporteDanoRepository.findAll(paginaDeReportes(numero));
-        if (resultado.getTotalPages() > 0 && numero > resultado.getTotalPages()) {
-            resultado = reporteDanoRepository.findAll(paginaDeReportes(resultado.getTotalPages()));
+    public Page<ReporteDano> listar(ReporteDanoFiltro filtro) {
+        Long tipoDanoId = validarTipoDano(filtro);
+        validarNivel(filtro);
+        validarEstado(filtro);
+
+        int numero = filtro.getPaginaValida();
+        Page<ReporteDano> resultado = buscarReportes(tipoDanoId, filtro, numero);
+        if (filtro.isTieneFiltros()
+                && (resultado.getTotalPages() == 0 || numero > resultado.getTotalPages())) {
+            filtro.setPagina("1");
+            resultado = buscarReportes(tipoDanoId, filtro, 1);
+        } else if (!filtro.isTieneFiltros() && resultado.getTotalPages() > 0
+                && numero > resultado.getTotalPages()) {
+            int ultimaPagina = resultado.getTotalPages();
+            filtro.setPagina(Integer.toString(ultimaPagina));
+            resultado = buscarReportes(null, filtro, ultimaPagina);
         }
         return resultado;
+    }
+
+    private Long validarTipoDano(ReporteDanoFiltro filtro) {
+        String valor = filtro.getTipoDanoId();
+        if (valor == null || valor.isBlank()) {
+            filtro.setTipoDanoId(null);
+            return null;
+        }
+        try {
+            Long id = Long.valueOf(valor.trim());
+            if (id > 0 && tipoDanoRepository.existsById(id)) {
+                filtro.setTipoDanoId(id.toString());
+                return id;
+            }
+        } catch (NumberFormatException error) {
+            filtro.getAvisos().add("El tipo de daño elegido no es válido; no se aplicó ese filtro.");
+            filtro.setTipoDanoId(null);
+            return null;
+        }
+        filtro.getAvisos().add("El tipo de daño elegido no es válido; no se aplicó ese filtro.");
+        filtro.setTipoDanoId(null);
+        return null;
+    }
+
+    private void validarNivel(ReporteDanoFiltro filtro) {
+        String nivel = normalizar(filtro.getNivel());
+        if (nivel == null) {
+            filtro.setNivel(null);
+        } else if (ReporteDano.NIVELES.contains(nivel)) {
+            filtro.setNivel(nivel);
+        } else {
+            filtro.getAvisos().add("El nivel elegido no es válido; no se aplicó ese filtro.");
+            filtro.setNivel(null);
+        }
+    }
+
+    private void validarEstado(ReporteDanoFiltro filtro) {
+        String estado = normalizar(filtro.getEstado());
+        if (estado == null) {
+            filtro.setEstado(null);
+        } else if (ReporteDano.ESTADOS.contains(estado)) {
+            filtro.setEstado(estado);
+        } else {
+            filtro.getAvisos().add("El estado elegido no es válido; no se aplicó ese filtro.");
+            filtro.setEstado(null);
+        }
+    }
+
+    private String normalizar(String valor) {
+        return valor == null || valor.isBlank() ? null : valor.trim().toUpperCase(Locale.ROOT);
+    }
+
+    private Page<ReporteDano> buscarReportes(Long tipoDanoId, ReporteDanoFiltro filtro, int numero) {
+        return reporteDanoRepository.buscarPorFiltros(tipoDanoId, filtro.getNivel(), filtro.getEstado(),
+                paginaDeReportes(numero));
     }
 
     private PageRequest paginaDeReportes(int numero) {
