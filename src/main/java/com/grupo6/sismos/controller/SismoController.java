@@ -78,6 +78,7 @@ public class SismoController {
     public String detalle(@PathVariable Long id, Model model) {
         model.addAttribute("sismo", sismoService.buscarPorId(id));
         model.addAttribute("reportes", reporteDanoService.listarPorSismo(id));
+        model.addAttribute("totalAfectados", reporteDanoService.totalAfectadosPorSismo(id));
         return "sismos/detalle";
     }
 
