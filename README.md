@@ -42,7 +42,7 @@ Curso Desarrollo de Aplicaciones Empresariales Avanzado · NRC 3703 · Grupo 6.
 | 3 | HU-26 | Actualizar el estado de un reporte | Cristian | ⏳ |
 | 3 | HU-29 | Marcar un sismo como relevante para seguimiento | Cristian | ⏳ |
 | 3 | HU-14 | Dar seguimiento a un sismo relevante | Cristian | ⏳ |
-| 3 | HU-28 | Ver el total de personas afectadas por sismo | Nick | ⏳ |
+| 3 | HU-28 | Ver el total de personas afectadas por sismo | Nick | ✅ |
 | 3 | HU-27 | Filtrar reportes por tipo, nivel y estado | Nick | ⏳ |
 | PA3 | — | Migración a Spring Boot, catálogos e importación CSV | José | ✅ |
 
