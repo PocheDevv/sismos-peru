@@ -1,0 +1,8 @@
+codigo,nombre,sector,descripcion,estado
+DAN-01,Salud,SALUD,Personas lesionadas o establecimientos de salud afectados.,ACTIVO
+DAN-02,Vivienda,VIVIENDA,Viviendas afectadas o colapsadas.,ACTIVO
+DAN-03,Educación,EDUCACION,Instituciones educativas afectadas.,ACTIVO
+DAN-04,Infraestructura,INFRAESTRUCTURA,Vías puentes u obras públicas afectadas.,ACTIVO
+DAN-05,Servicios básicos,SERVICIOS_BASICOS,Agua energía saneamiento o telecomunicaciones afectadas.,ACTIVO
+DAN-06,Agropecuario,AGROPECUARIO,Cultivos ganado o medios de vida afectados.,ACTIVO
+DAN-07,Población,POBLACION,Personas afectadas damnificadas o desaparecidas.,ACTIVO

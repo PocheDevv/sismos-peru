@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${sismo == null} ? 'Registrar sismo' : 'Editar sismo')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('sismos')}"></div>
+<main class="contenedor" th:with="esEditar=${sismo != null}">
+    <p class="breadcrumb">
+        <a th:href="@{/sismos}">Sismos</a> /
+        <th:block th:if="${esEditar}">
+            <a th:href="@{/sismos/{id}(id=${sismo.id})}" th:text="${sismo.codigo}"></a> / Editar
+        </th:block>
+        <th:block th:unless="${esEditar}">Registrar sismo</th:block>
+    </p>
+    <h1 th:text="${esEditar} ? 'Editar sismo ' + ${sismo.codigo} : 'Registrar sismo'"></h1>
+    <p class="subtitulo">Los campos marcados con * son obligatorios. El ubigeo y la alerta deben estar activos.</p>
+
+    <form method="post" th:object="${sismoForm}" novalidate
+          th:action="${esEditar} ? @{/sismos/{id}(id=${sismo.id})} : @{/sismos}">
+        <div th:replace="~{fragments/layout :: erroresFormulario(${esEditar} ? 'guardar el sismo' : 'registrar el sismo')}"></div>
+
+        <section class="tarjeta">
+            <div class="seccion-titulo">Datos del evento</div>
+            <div class="formulario-grid">
+                <label>
+                    <span class="campo-obligatorio">Código</span>
+                    <input th:field="*{codigo}" maxlength="20" placeholder="Ej. SIS-031" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}"></span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Fecha y hora</span>
+                    <input type="datetime-local" th:field="*{fechaHora}" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('fechaHora')}" th:errors="*{fechaHora}"></span>
+                    <span class="ayuda" th:unless="${#fields.hasErrors('fechaHora')}">No puede ser una fecha futura.</span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Tipo de alerta</span>
+                    <select th:field="*{tipoAlertaId}" th:errorclass="campo-error">
+                        <option value="">Seleccione</option>
+                        <option th:each="a : ${alertas}" th:value="${a.id}"
+                                th:text="${a.nombre} + ' (' + ${a.color} + ')' + (${a.activo} ? '' : ' - inactiva')"
+                                th:disabled="${!a.activo and a.id != sismoForm.tipoAlertaId}"></option>
+                    </select>
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('tipoAlertaId')}" th:errors="*{tipoAlertaId}"></span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Magnitud</span>
+                    <input type="number" step="0.1" th:field="*{magnitud}" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('magnitud')}" th:errors="*{magnitud}"></span>
+                    <span class="ayuda" th:unless="${#fields.hasErrors('magnitud')}">Mayor que 0 y hasta 10.</span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Profundidad (km)</span>
+                    <input type="number" step="0.1" th:field="*{profundidad}" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('profundidad')}" th:errors="*{profundidad}"></span>
+                    <span class="ayuda" th:unless="${#fields.hasErrors('profundidad')}">No puede ser negativa.</span>
+                </label>
+                <label>
+                    <span>Intensidad</span>
+                    <select th:field="*{intensidad}" th:errorclass="campo-error">
+                        <option value="">Sin especificar</option>
+                        <option th:each="i : ${intensidades}" th:value="${i}" th:text="${i}"></option>
+                    </select>
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('intensidad')}" th:errors="*{intensidad}"></span>
+                </label>
+                <label>
+                    <span>Estación que lo registró</span>
+                    <select th:field="*{estacionId}" th:errorclass="campo-error">
+                        <option value="">Sin estación</option>
+                        <option th:each="e : ${estaciones}" th:value="${e.id}"
+                                th:text="${e.codigo} + ' · ' + ${e.nombre} + (${e.activa} ? '' : ' (inactiva)')"
+                                th:disabled="${!e.activa and e.id != sismoForm.estacionId}"></option>
+                    </select>
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('estacionId')}" th:errors="*{estacionId}"></span>
+                    <span class="ayuda" th:unless="${#fields.hasErrors('estacionId')}">Las estaciones inactivas no reciben nuevos registros.</span>
+                </label>
+                <label th:if="${esEditar}">
+                    <span class="campo-obligatorio">Estado</span>
+                    <select th:field="*{estado}" th:errorclass="campo-error">
+                        <option th:each="e : ${estados}" th:value="${e}" th:text="${e}"></option>
+                    </select>
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('estado')}" th:errors="*{estado}"></span>
+                </label>
+                <label th:unless="${esEditar}">
+                    <span>Estado</span>
+                    <input value="Registrado" disabled>
+                    <span class="ayuda">Se asigna automáticamente al registrar.</span>
+                </label>
+            </div>
+
+            <div class="seccion-titulo">Ubicación</div>
+            <div class="formulario-grid">
+                <th:block th:replace="~{fragments/layout :: cascadaUbigeo}"></th:block>
+                <label>
+                    <span class="campo-obligatorio">Latitud</span>
+                    <input type="number" step="0.0001" th:field="*{latitud}" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('latitud')}" th:errors="*{latitud}"></span>
+                    <span class="ayuda" th:unless="${#fields.hasErrors('latitud')}">Entre -90 y 90.</span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Longitud</span>
+                    <input type="number" step="0.0001" th:field="*{longitud}" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('longitud')}" th:errors="*{longitud}"></span>
+                    <span class="ayuda" th:unless="${#fields.hasErrors('longitud')}">Entre -180 y 180.</span>
+                </label>
+                <label>
+                    <span>Referencia</span>
+                    <input th:field="*{referencia}" maxlength="150" placeholder="Ej. 12 km al SO de Chivay" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('referencia')}" th:errors="*{referencia}"></span>
+                </label>
+            </div>
+        </section>
+
+        <div class="acciones">
+            <button class="boton" type="submit" th:text="${esEditar} ? 'Guardar cambios' : 'Registrar sismo'"></button>
+            <a class="boton-secundario" th:href="${esEditar} ? @{/sismos/{id}(id=${sismo.id})} : @{/sismos}">Cancelar</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

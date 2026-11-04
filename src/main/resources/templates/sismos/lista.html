@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Sismos')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('sismos')}"></div>
+<main class="contenedor">
+    <div class="encabezado">
+        <div>
+            <h1>Sismos registrados</h1>
+            <p class="subtitulo">Eventos sísmicos reportados en el territorio peruano.</p>
+        </div>
+        <a class="boton" th:href="@{/sismos/nuevo}">+ Registrar sismo</a>
+    </div>
+
+    <th:block th:replace="~{fragments/layout :: mensajes}"></th:block>
+    <div class="alerta alerta-error" th:if="${!filtro.avisos.isEmpty()}">
+        <div th:each="aviso : ${filtro.avisos}" th:text="${aviso}"></div>
+    </div>
+
+    <!-- HU-15, HU-30 y HU-31: búsqueda y filtros -->
+    <section class="tarjeta">
+        <form method="get" th:action="@{/sismos}" class="filtros">
+            <label>
+                <span>Código o referencia</span>
+                <input name="q" type="search" maxlength="150" placeholder="Ej. SIS-001 o Chivay" th:value="${filtro.q}">
+            </label>
+            <label>
+                <span>Departamento</span>
+                <select name="departamentoId">
+                    <option value="">Todos</option>
+                    <option th:each="d : ${departamentos}" th:value="${d.id}" th:text="${d.nombre}"
+                            th:selected="${d.id == filtro.departamentoId}"></option>
+                </select>
+            </label>
+            <label>
+                <span>Estado</span>
+                <select name="estado">
+                    <option value="">Todos</option>
+                    <option th:each="e : ${estados}" th:value="${e}" th:text="${e}" th:selected="${e == filtro.estado}"></option>
+                </select>
+            </label>
+            <label>
+                <span>Alerta</span>
+                <select name="tipoAlertaId">
+                    <option value="">Todas</option>
+                    <option th:each="a : ${alertas}" th:value="${a.id}" th:text="${a.nombre}"
+                            th:selected="${a.id == filtro.tipoAlertaId}"></option>
+                </select>
+            </label>
+            <label>
+                <span>Magnitud desde</span>
+                <input name="magnitudMin" type="number" step="0.1" min="0" max="10" placeholder="Ej. 4.0" th:value="${filtro.magnitudMin}">
+            </label>
+            <label>
+                <span>Magnitud hasta</span>
+                <input name="magnitudMax" type="number" step="0.1" min="0" max="10" placeholder="Ej. 6.0" th:value="${filtro.magnitudMax}">
+            </label>
+            <label>
+                <span>Desde</span>
+                <input name="desde" type="date" th:value="${filtro.desde}">
+            </label>
+            <label>
+                <span>Hasta</span>
+                <input name="hasta" type="date" th:value="${filtro.hasta}">
+            </label>
+            <div class="acciones">
+                <button class="boton" type="submit">Buscar</button>
+                <a class="boton-secundario" th:href="@{/sismos}">Limpiar filtros</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="tarjeta">
+        <div class="barra-resultados">
+            <span th:if="${pagina.totalElements > 0}"
+                  th:text="'Mostrando ' + ${pagina.number * pagina.size + 1} + '–' + ${pagina.number * pagina.size + pagina.numberOfElements} + ' de ' + ${pagina.totalElements} + ' sismo(s)'"></span>
+            <span th:if="${pagina.totalElements == 0}">0 sismos</span>
+            <span class="nota">Haga clic en un encabezado para ordenar.</span>
+        </div>
+        <div class="tabla-scroll">
+            <table>
+                <thead>
+                <tr>
+                    <th><a th:href="@{${filtro.urlOrden('codigo')}}" th:text="'Código' + ${filtro.indicadorOrden('codigo')}"></a></th>
+                    <th><a th:href="@{${filtro.urlOrden('fecha')}}" th:text="'Fecha y hora' + ${filtro.indicadorOrden('fecha')}"></a></th>
+                    <th><a th:href="@{${filtro.urlOrden('magnitud')}}" th:text="'Magnitud' + ${filtro.indicadorOrden('magnitud')}"></a></th>
+                    <th><a th:href="@{${filtro.urlOrden('profundidad')}}" th:text="'Profundidad' + ${filtro.indicadorOrden('profundidad')}"></a></th>
+                    <th><a th:href="@{${filtro.urlOrden('ubicacion')}}" th:text="'Ubicación' + ${filtro.indicadorOrden('ubicacion')}"></a></th>
+                    <th><a th:href="@{${filtro.urlOrden('alerta')}}" th:text="'Alerta' + ${filtro.indicadorOrden('alerta')}"></a></th>
+                    <th><a th:href="@{${filtro.urlOrden('estado')}}" th:text="'Estado' + ${filtro.indicadorOrden('estado')}"></a></th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${sismos.isEmpty()}">
+                    <td colspan="8" class="vacio">
+                        <span th:if="${!filtro.textoLimpio.isEmpty()}"
+                              th:text="'No se encontraron sismos para &quot;' + ${filtro.textoLimpio} + '&quot;. Verifique el código o la referencia.'"></span>
+                        <span th:if="${filtro.textoLimpio.isEmpty() and filtro.tieneFiltros}">Ningún sismo cumple los filtros indicados.</span>
+                        <span th:if="${!filtro.tieneFiltros}">No hay sismos registrados.</span>
+                    </td>
+                </tr>
+                <tr th:each="s : ${sismos}">
+                    <td><a th:href="@{/sismos/{id}(id=${s.id})}" th:text="${s.codigo}"></a></td>
+                    <td th:text="${#temporals.format(s.fechaHora, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td th:text="'M ' + ${#numbers.formatDecimal(s.magnitud, 1, 1)}"></td>
+                    <td th:text="${#numbers.formatDecimal(s.profundidad, 1, 0)} + ' km'"></td>
+                    <td th:text="${s.ubigeo.ubicacionCompleta}"></td>
+                    <td><span th:class="${s.tipoAlerta.claseColor}" th:text="${s.tipoAlerta.nombre}"></span></td>
+                    <td><span th:class="${s.claseEstado}" th:text="${s.estado}"></span></td>
+                    <td class="acciones-tabla">
+                        <a th:href="@{/sismos/{id}(id=${s.id})}">Ver</a>
+                        <a th:href="@{/sismos/{id}/editar(id=${s.id})}">Editar</a>
+                        <a class="enlace-peligro" th:href="@{/sismos/{id}/eliminar(id=${s.id})}">Eliminar</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <nav class="paginacion" th:if="${pagina.totalPages > 1}">
+            <a th:if="${pagina.hasPrevious()}" th:href="@{${filtro.urlPagina(pagina.number)}}">‹ Anterior</a>
+            <span th:unless="${pagina.hasPrevious()}" class="deshabilitado">‹ Anterior</span>
+            <th:block th:each="n : ${#numbers.sequence(1, pagina.totalPages)}">
+                <span th:if="${n == pagina.number + 1}" class="actual" th:text="${n}"></span>
+                <a th:unless="${n == pagina.number + 1}" th:href="@{${filtro.urlPagina(n)}}" th:text="${n}"></a>
+            </th:block>
+            <a th:if="${pagina.hasNext()}" th:href="@{${filtro.urlPagina(pagina.number + 2)}}">Siguiente ›</a>
+            <span th:unless="${pagina.hasNext()}" class="deshabilitado">Siguiente ›</span>
+        </nav>
+    </section>
+</main>
+</body>
+</html>

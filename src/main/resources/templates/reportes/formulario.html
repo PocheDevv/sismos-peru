@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${reporte == null} ? 'Registrar reporte de afectación' : 'Editar reporte de afectación')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('sismos')}"></div>
+<main class="contenedor" th:with="esEditar=${reporte != null}">
+    <p class="breadcrumb">
+        <a th:href="@{/sismos}">Sismos</a> /
+        <a th:href="@{/sismos/{id}(id=${sismo.id})}" th:text="${sismo.codigo}"></a> /
+        <span th:text="${esEditar} ? 'Editar reporte de afectación' : 'Registrar reporte de afectación'"></span>
+    </p>
+    <h1 th:text="${esEditar} ? 'Editar reporte de afectación' : 'Registrar reporte de afectación'"></h1>
+    <p class="subtitulo">
+        Sismo <strong th:text="${sismo.codigo}"></strong>
+        · <span th:text="${#temporals.format(sismo.fechaHora, 'dd/MM/yyyy HH:mm')}"></span>
+        · <span th:text="${sismo.ubigeo.ubicacionCompleta}"></span>.
+        Los campos marcados con * son obligatorios.
+    </p>
+
+    <form method="post" th:object="${reporteForm}" novalidate
+          th:action="${esEditar} ? @{/sismos/{s}/reportes/{id}(s=${sismo.id}, id=${reporte.id})} : @{/sismos/{id}/reportes(id=${sismo.id})}">
+        <div th:replace="~{fragments/layout :: erroresFormulario(${esEditar} ? 'guardar el reporte' : 'registrar el reporte')}"></div>
+
+        <section class="tarjeta">
+            <div class="seccion-titulo">Datos de la afectación</div>
+            <div class="formulario-grid">
+                <label>
+                    <span class="campo-obligatorio">Tipo de daño</span>
+                    <select th:field="*{tipoDanoId}" th:errorclass="campo-error">
+                        <option value="">Seleccione</option>
+                        <option th:each="t : ${tiposDano}" th:value="${t.id}"
+                                th:text="${t.nombre} + (${t.activo} ? '' : ' (inactivo)')"></option>
+                    </select>
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('tipoDanoId')}" th:errors="*{tipoDanoId}"></span>
+                    <span class="ayuda" th:unless="${#fields.hasErrors('tipoDanoId')}">Solo se muestran los tipos de daño activos.</span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Fecha y hora del reporte</span>
+                    <input type="datetime-local" th:field="*{fechaReporte}" th:errorclass="campo-error"
+                           th:min="${#temporals.format(sismo.fechaHora, 'yyyy-MM-dd''T''HH:mm')}">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('fechaReporte')}" th:errors="*{fechaReporte}"></span>
+                    <span class="ayuda" th:unless="${#fields.hasErrors('fechaReporte')}">Entre la ocurrencia del sismo y el momento actual.</span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Cantidad afectada</span>
+                    <input type="number" min="1" step="1" th:field="*{cantidadAfectada}" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('cantidadAfectada')}" th:errors="*{cantidadAfectada}"></span>
+                    <span class="ayuda" th:unless="${#fields.hasErrors('cantidadAfectada')}">Mayor que cero: viviendas, personas o elementos afectados.</span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Nivel de afectación</span>
+                    <select th:field="*{nivel}" th:errorclass="campo-error">
+                        <option th:each="n : ${niveles}" th:value="${n}" th:text="${n}"></option>
+                    </select>
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('nivel')}" th:errors="*{nivel}"></span>
+                </label>
+                <label>
+                    <span>Estado</span>
+                    <input th:value="${esEditar} ? ${reporte.estado} : 'PENDIENTE'" disabled>
+                    <span class="ayuda" th:text="${esEditar} ? 'El estado no se modifica desde aquí.' : 'Se asigna automáticamente al registrar.'"></span>
+                </label>
+                <label class="ancho-completo">
+                    <span class="campo-obligatorio">Descripción</span>
+                    <textarea th:field="*{descripcion}" rows="4" maxlength="500"
+                              placeholder="Ej. Fisuras en muros de adobe de viviendas del casco urbano."
+                              th:errorclass="campo-error"></textarea>
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></span>
+                    <span class="ayuda" th:unless="${#fields.hasErrors('descripcion')}">Máximo 500 caracteres.</span>
+                </label>
+            </div>
+        </section>
+
+        <div class="acciones">
+            <button class="boton" type="submit" th:text="${esEditar} ? 'Guardar cambios' : 'Registrar reporte'"></button>
+            <a class="boton-secundario" th:href="@{/sismos/{id}(id=${sismo.id})}">Cancelar</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

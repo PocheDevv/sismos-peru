@@ -1,99 +1,124 @@
-# Sistema de Gestión de Sismos — Sprint 2 (PA2)
+# SismosPerú — Sprint 3 (PA3)
 
-Grupo 6 · Desarrollo de Aplicaciones Empresariales Avanzado · ISIL 2026-20
-
-Aplicación web en Java (Servlets, JSP y MVC) con persistencia en **MySQL** mediante **JPA (EclipseLink)**.
+Sistema de Gestión de Sismos del Perú migrado a **Spring Boot 3.5 + Thymeleaf + Spring Data JPA + MySQL**.
+Curso Desarrollo de Aplicaciones Empresariales Avanzado · NRC 3703 · Grupo 6.
 
 ## Puesta en marcha (cada integrante, una sola vez)
 
-1. **MySQL 8 o superior** iniciado.
-2. En DBeaver (o MySQL Workbench) ejecutar, en este orden:
-   - `database/01_schema.sql`: crea la base `cssp_sismos` y sus tablas. **Si ya existían, las borra y las vuelve a crear.**
-   - `database/02_datos_iniciales.sql`: carga los datos de ejemplo (12 departamentos, 22 distritos, 10 estaciones y 30 sismos).
-3. Crear el archivo `src/main/resources/db-local.properties` con tu usuario y contraseña de MySQL:
-   ```properties
-   usuario=root
-   contrasena=tu_contraseña
-   ```
-   Este archivo está en `.gitignore`: **nunca se sube al repositorio**. `db.properties` solo tiene los valores por defecto.
-4. Recargar Maven (NetBeans: Reload POM · IntelliJ: Reload All Maven Projects) y ejecutar en **Tomcat 10.1 u 11**.
-5. Abrir `http://localhost:8080/sistema-de-gestion-de-sismos/sismos`.
+1. Ejecutar `database/01_schema.sql` en MySQL Workbench o DBeaver (ejecutar el script completo). Crea la base `sismos_peru`.
+2. Copiar `src/main/resources/application-local.properties.example` como
+   `src/main/resources/application-local.properties` y escribir su usuario y contraseña de MySQL.
+   Ese archivo está en `.gitignore`: **la contraseña nunca se sube al repositorio**.
+3. Abrir el `pom.xml` en IntelliJ (Open as Project), con SDK **JDK 21** (corretto-21), y dar a
+   **Reload All Maven Projects**.
+4. Ejecutar `SismosPeruApplication` y abrir <http://localhost:8080>.
+5. En **Importar CSV**, importar en este orden los archivos de la carpeta `datos/`:
+   `ubigeo.csv` (25), `tipo_alerta.csv` (4) y `tipo_dano.csv` (7).
+6. (Opcional) Ejecutar `database/02_datos_demo.sql` para cargar provincias, distritos, 10 estaciones
+   y 30 sismos de prueba. Requiere haber importado los CSV del paso 5.
 
-Para volver a los datos de ejemplo (por ejemplo, antes de grabar el video), ejecutar otra vez los dos scripts.
+## Estado de las historias de usuario
 
-## Estado de las HU del sprint 2
-
-| HU | Descripción | Responsable | Estado |
-|----|-------------|-------------|--------|
-| HU-15 | Buscar, filtrar, ordenar y paginar sismos | José | ✅ |
-| HU-09 | Gestionar ubicaciones geográficas | José | ✅ |
-| HU-21 | Seleccionar la ubicación en cascada | Víctor | ✅ |
-| HU-10 | Gestionar estaciones de monitoreo | Víctor | ✅ |
-| HU-11 | Asociar un sismo a la estación que lo registró | Cristian | ⏳ |
-| HU-30 | Filtrar sismos por estado del evento | Cristian | ⏳ |
-| HU-31 | Buscar un sismo por código o referencia geográfica | Nick | ✅ |
-
-Base del proyecto (José): migración a JPA y MySQL, script SQL, entidades con relaciones y repositorios JPA.
+| Sprint | HU | Historia | Responsable | Estado |
+|---|---|---|---|---|
+| 1 | HU-01 | Listar sismos | Víctor | ✅ |
+| 1 | HU-02 | Registrar un nuevo sismo | Nick | ✅ |
+| 1 | HU-03 | Validar campos obligatorios y código único | José | ✅ |
+| 1 | HU-04 | Validar magnitud, profundidad, coordenadas y fecha | Cristian | ✅ |
+| 1 | HU-08 | Gestionar el estado del evento | Cristian | ✅ |
+| 1 | HU-05 | Ver el detalle de un sismo | José | ✅ |
+| 1 | HU-06 | Editar un sismo | Nick | ✅ |
+| 1 | HU-07 | Eliminar un sismo con confirmación | Víctor | ✅ |
+| 2 | HU-15 | Buscar, filtrar, ordenar y paginar sismos | José | ✅ |
+| 2 | HU-09 | Gestionar ubicaciones geográficas (ubigeo) | José | ✅ |
+| 2 | HU-21 | Seleccionar la ubicación en cascada | Víctor | ✅ |
+| 2 | HU-10 | Gestionar estaciones de monitoreo | Víctor | ✅ |
+| 2 | HU-11 | Asociar un sismo a la estación que lo registró | Cristian | ✅ |
+| 2 | HU-30 | Filtrar sismos por estado del evento | Cristian | ✅ |
+| 2 | HU-31 | Buscar un sismo por código o referencia geográfica | Nick | ✅ |
+| 3 | HU-12 | Registrar reportes de afectación (daño) | Víctor | ✅ |
+| 3 | HU-13 | Consultar reportes de afectación | Víctor | ✅ |
+| 3 | HU-25 | Editar un reporte de afectación | Víctor | ✅ |
+| 3 | HU-26 | Actualizar el estado de un reporte | Cristian | ⏳ |
+| 3 | HU-29 | Marcar un sismo como relevante para seguimiento | Cristian | ⏳ |
+| 3 | HU-14 | Dar seguimiento a un sismo relevante | Cristian | ⏳ |
+| 3 | HU-28 | Ver el total de personas afectadas por sismo | Nick | ⏳ |
+| 3 | HU-27 | Filtrar reportes por tipo, nivel y estado | Nick | ⏳ |
+| PA3 | — | Migración a Spring Boot, catálogos e importación CSV | José | ✅ |
 
 ## Modelo de datos
 
 ```
-Departamento 1 ── N Provincia 1 ── N Distrito 1 ── N Sismo
-                                       │                ▲
-                                       └── N Estación 1 ┘ (opcional)
-Sismo 1 ── N ReporteAfectacion        Sismo 1 ── N SeguimientoSismo
+Ubigeo      1 ── N  Sismo           (cada sismo en un ubigeo ACTIVO)
+TipoAlerta  1 ── N  Sismo           (cada sismo con una alerta ACTIVA)
+Sismo       1 ── N  ReporteDano     (cantidad afectada, descripción, nivel, estado)
+TipoDano    1 ── N  ReporteDano     (cada reporte con un tipo de daño ACTIVO)
+Ubigeo      1 ── N  EstacionMonitoreo,  EstacionMonitoreo 1 ── N Sismo (opcional)
+Sismo       1 ── N  SeguimientoSismo
+Ubigeo      1 ── N  Ubigeo          (departamento > provincia > distrito, por padre_id)
 ```
 
-Las tablas y columnas de `database/01_schema.sql` coinciden con las anotaciones `@Table` y `@Column`
-de las entidades. Las restricciones `UNIQUE`, `CHECK` y `FOREIGN KEY` están en el script.
+Las tablas las crean los scripts de `database/`; Hibernate solo las valida (`ddl-auto=validate`).
+Si una HU necesita una columna nueva, se agrega en `01_schema.sql` **y** en la entidad.
 
 ## Estructura
 
 ```
-src/main/java/com/grupo6/sistema/
-├── config/       JpaUtil: crea el EntityManagerFactory (unidad SismosPU) y lee db.properties
-├── model/        Entidades JPA (@Entity) y TipoUbicacion
-├── repository/   RepositorioJpa (CRUD con EntityManager y transacciones) y un repositorio por entidad
-├── busqueda/     SismoBusqueda (filtros, orden y página) y Pagina
-├── servicio/     UbicacionServicio (reglas del catálogo de ubicaciones)
-├── validacion/   Formularios y validadores
-├── listener/     AplicacionListener: comparte los repositorios y cierra JPA al detener
-└── servlet/      Controladores
-src/main/resources/
-├── META-INF/persistence.xml
-└── db.properties (+ db-local.properties, solo en tu computadora)
-src/main/webapp/WEB-INF/views/
-├── comun/barra.jspf   Barra superior compartida (agregar aquí el enlace de un módulo nuevo)
-├── sismos/  ubicaciones/  error/
-database/   01_schema.sql y 02_datos_iniciales.sql
+com.grupo6.sismos
+├── controller/   un @Controller por módulo; sin reglas de negocio
+├── service/      reglas de negocio y @Transactional
+├── repository/   interfaces JpaRepository (+ SismoEspecificaciones para la búsqueda)
+├── entity/       entidades JPA
+├── importacion/  lectura de CSV y resultado de la importación
+└── web/
+    ├── form/     formularios con Bean Validation (@NotBlank, @Positive, ...)
+    └── error/    ReglaNegocioException, RecursoNoEncontradoException, ManejadorErrores
+templates/<módulo>/lista.html, formulario.html, detalle.html
 ```
 
-## Reglas para no romper el código de los demás
+## Cómo se hace una HU (patrón del proyecto)
 
-- **Repositorios:** tomarlos del `ServletContext` con las constantes de `AplicacionListener`.
-- **Transacciones:** todo lo que modifica datos pasa por `agregar`, `actualizar` o `eliminar` de `RepositorioJpa`,
-  que ya hacen `begin`, `commit` y `rollback`. Para consultas nuevas usar `consultar(...)`.
-- **Relaciones:** si una entidad tiene un `@ManyToOne`, sobrescribir `prepararRelaciones` en su repositorio
-  (ver `SismoRepository`) para usar `em.getReference(...)`.
-- **Tablas nuevas o columnas nuevas:** agregarlas al script SQL y a la entidad con el mismo nombre.
-- **Estados:** usar las constantes de `Sismo` y `EstacionMonitoreo`, nunca escribir los textos a mano.
-- **Ramas:** una rama por HU creada desde `main` actualizado y unirla con un Pull Request.
+1. **Form** en `web/form` con Bean Validation para los datos de entrada.
+2. **Service** con `@Transactional`: reglas de negocio. Si una regla falla, lanza
+   `new ReglaNegocioException("campo", "mensaje")` (campo `null` si es un mensaje general).
+3. **Controller**: `@Valid @ModelAttribute` + `BindingResult`. Si no hay errores llama al servicio;
+   si el servicio lanza `ReglaNegocioException`, `Errores.registrar(errores, error)` la muestra en el campo.
+   Después de guardar, `redirect` con `addFlashAttribute("exito", ...)`.
+4. **Vista** Thymeleaf usando `fragments/layout` (`head`, `barra`, `mensajes`, `erroresFormulario`).
 
-## Guía rápida para las HU pendientes
+Ejemplos completos: `SismoController` + `SismoService` + `SismoForm` + `templates/sismos/`.
 
-- **HU-11 Sismo y estación (Cristian):** la relación `Sismo N ── 1 Estación` y la regla de estación inactiva
-  ya están en la base (`SismoValidador`). Queda completar los criterios de la HU en las pantallas.
-- **HU-30 Estado (Cristian):** agregar el filtro en `SismoBusqueda`, su condición JPQL en
-  `SismoRepository.agregarCondiciones` y el campo en el formulario de filtros de `sismos/lista.jsp`.
+## Guía para el sprint 3
+
+Ya existen la tabla, la entidad y el repositorio de **ReporteDano** y **SeguimientoSismo**, y la columna
+`sismo.relevante`. Falta construir las pantallas:
+
+Orden sugerido (por dependencias): primero HU-12; luego HU-13, HU-25, HU-26 y HU-28; al final HU-27.
+HU-29 y HU-14 no dependen de los reportes y se pueden hacer en paralelo.
+
+- **HU-12 (Víctor):** `ReporteDanoForm` + `ReporteDanoService.registrar` + `ReporteDanoController`.
+  Registrar desde el detalle del sismo (`/sismos/{id}/reportes/nuevo`). Reglas: el tipo de daño debe
+  estar ACTIVO (`TipoDanoService.activos()` para el select), cantidad afectada ≥ 0, descripción obligatoria.
+- **HU-13 (Víctor):** listado de reportes (general y en el detalle del sismo, donde está el comentario
+  `Sprint 3` en `sismos/detalle.html`). `ReporteDanoRepository.findBySismoIdOrderByFechaReporteDesc`.
+- **HU-25 (Víctor):** editar un reporte reutilizando el formulario de HU-12.
+- **HU-26 (Cristian):** cambiar el estado del reporte (PENDIENTE → VERIFICADO → CERRADO; un reporte
+  CERRADO ya no se modifica).
+- **HU-29 (Cristian):** marcar o desmarcar `relevante` desde el detalle del sismo.
+- **HU-14 (Cristian):** bitácora de seguimiento de un sismo relevante (`SeguimientoSismo`).
+- **HU-28 (Nick):** total de afectados en el detalle del sismo (consulta `SUM(cantidadAfectada)`).
+- **HU-27 (Nick):** filtros de reportes por tipo de daño, nivel y estado.
+
+Reglas del equipo: una rama por HU desde `main` actualizado, Pull Request para unir, no subir
+`application-local.properties`, `target/` ni `.idea/`.
 
 ## Rutas
 
 | Ruta | Qué hace |
 |---|---|
-| GET `/sismos` | Lista con búsqueda (`buscar` por código o ubicación), filtros (`departamentoId`, `magnitudMin`, `magnitudMax`, `desde`, `hasta`), orden (`orden`, `dir`) y página (`pagina`) |
-| GET/POST `/sismos/nuevo`, `/sismos/editar?id=X`, `/sismos/eliminar?id=X` | CRUD de sismos |
-| GET `/sismos/detalle?id=X` | Detalle |
-| GET `/ubicaciones`, `?departamentoId=X`, `?provinciaId=Y` | Catálogo de ubicaciones por nivel |
-| GET/POST `/ubicaciones/nuevo?tipo=…&padreId=…`, `/ubicaciones/editar?tipo=…&id=…`, `/ubicaciones/eliminar?tipo=…&id=…` | CRUD de departamentos, provincias y distritos |
-
-La consola de Tomcat muestra las sentencias SQL que genera JPA (útil para la demostración del video).
+| `/sismos` | Lista con búsqueda, filtros, orden y paginación (HU-01, 15, 30, 31) |
+| `/sismos/nuevo`, `/sismos/{id}`, `/sismos/{id}/editar`, `/sismos/{id}/eliminar` | Registrar, detalle, editar, eliminar |
+| `/ubigeos?padreId=` | Ubigeos por nivel; nuevo, editar y eliminar (HU-09) |
+| `/estaciones` | Estaciones de monitoreo (HU-10, HU-11) |
+| `/tipos-alerta`, `/tipos-dano` | Maestros: listar, registrar, activar o desactivar |
+| `/importacion` | Importar `ubigeo.csv`, `tipo_alerta.csv` y `tipo_dano.csv` |

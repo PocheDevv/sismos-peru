@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Nuevo tipo de daño')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('danos')}"></div>
+<main class="contenedor">
+    <p class="breadcrumb"><a th:href="@{/tipos-dano}">Tipos de daño</a> / Nuevo</p>
+    <h1>Nuevo tipo de daño</h1>
+    <p class="subtitulo">Los campos marcados con * son obligatorios. El código no se puede repetir.</p>
+    <form method="post" th:action="@{/tipos-dano}" th:object="${tipoDanoForm}" novalidate class="formulario-corto">
+        <div th:replace="~{fragments/layout :: erroresFormulario('registrar el tipo de daño')}"></div>
+        <section class="tarjeta">
+            <div class="formulario-grid dos-columnas">
+                <label>
+                    <span class="campo-obligatorio">Código</span>
+                    <input th:field="*{codigo}" maxlength="10" placeholder="Ej. DAN-08" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}"></span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Nombre</span>
+                    <input th:field="*{nombre}" maxlength="60" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Sector</span>
+                    <input th:field="*{sector}" maxlength="40" placeholder="Ej. TRANSPORTE" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('sector')}" th:errors="*{sector}"></span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Estado</span>
+                    <select th:field="*{estado}" th:errorclass="campo-error">
+                        <option value="ACTIVO">ACTIVO</option>
+                        <option value="INACTIVO">INACTIVO</option>
+                    </select>
+                </label>
+                <label class="ancho-completo">
+                    <span>Descripción</span>
+                    <textarea th:field="*{descripcion}" maxlength="200" rows="2" th:errorclass="campo-error"></textarea>
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></span>
+                </label>
+            </div>
+        </section>
+        <div class="acciones">
+            <button class="boton" type="submit">Registrar</button>
+            <a class="boton-secundario" th:href="@{/tipos-dano}">Cancelar</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

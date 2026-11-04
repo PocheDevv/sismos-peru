@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${estacion == null} ? 'Nueva estación' : 'Editar estación')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('estaciones')}"></div>
+<main class="contenedor" th:with="esEditar=${estacion != null}">
+    <p class="breadcrumb"><a th:href="@{/estaciones}">Estaciones</a> / <span th:text="${esEditar} ? 'Editar ' + ${estacion.codigo} : 'Nueva estación'"></span></p>
+    <h1 th:text="${esEditar} ? 'Editar estación ' + ${estacion.codigo} : 'Nueva estación'"></h1>
+    <p class="subtitulo">Los campos marcados con * son obligatorios.</p>
+
+    <form method="post" th:object="${estacionForm}" novalidate
+          th:action="${esEditar} ? @{/estaciones/{id}(id=${estacion.id})} : @{/estaciones}">
+        <div th:replace="~{fragments/layout :: erroresFormulario('guardar la estación')}"></div>
+        <section class="tarjeta">
+            <div class="seccion-titulo">Datos de la estación</div>
+            <div class="formulario-grid">
+                <label>
+                    <span class="campo-obligatorio">Código</span>
+                    <input th:field="*{codigo}" maxlength="10" placeholder="Ej. ARE-02" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}"></span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Nombre</span>
+                    <input th:field="*{nombre}" maxlength="100" placeholder="Ej. Estación Arequipa Norte" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Fecha de instalación</span>
+                    <input type="date" th:field="*{fechaInstalacion}" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('fechaInstalacion')}" th:errors="*{fechaInstalacion}"></span>
+                    <span class="ayuda" th:unless="${#fields.hasErrors('fechaInstalacion')}">No puede ser futura.</span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Latitud</span>
+                    <input type="number" step="0.0001" th:field="*{latitud}" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('latitud')}" th:errors="*{latitud}"></span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Longitud</span>
+                    <input type="number" step="0.0001" th:field="*{longitud}" th:errorclass="campo-error">
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('longitud')}" th:errors="*{longitud}"></span>
+                </label>
+                <label>
+                    <span class="campo-obligatorio">Estado</span>
+                    <select th:field="*{estado}" th:errorclass="campo-error">
+                        <option value="ACTIVO">ACTIVO</option>
+                        <option value="INACTIVO">INACTIVO</option>
+                    </select>
+                    <span class="ayuda-error" th:if="${#fields.hasErrors('estado')}" th:errors="*{estado}"></span>
+                </label>
+            </div>
+            <div class="seccion-titulo">Ubicación</div>
+            <div class="formulario-grid">
+                <th:block th:replace="~{fragments/layout :: cascadaUbigeo}"></th:block>
+            </div>
+        </section>
+        <div class="acciones">
+            <button class="boton" type="submit" th:text="${esEditar} ? 'Guardar cambios' : 'Registrar estación'"></button>
+            <a class="boton-secundario" th:href="@{/estaciones}">Cancelar</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

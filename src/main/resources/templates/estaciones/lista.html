@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Estaciones')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('estaciones')}"></div>
+<main class="contenedor">
+    <div class="encabezado">
+        <div>
+            <h1>Estaciones de monitoreo</h1>
+            <p class="subtitulo">Estaciones que captan los eventos sísmicos. Las inactivas no reciben sismos nuevos.</p>
+        </div>
+        <a class="boton" th:href="@{/estaciones/nuevo}">+ Nueva estación</a>
+    </div>
+
+    <th:block th:replace="~{fragments/layout :: mensajes}"></th:block>
+
+    <section class="tarjeta">
+        <h2 class="titulo-tarjeta" th:text="'Estaciones registradas: ' + ${estaciones.size()}"></h2>
+        <div class="tabla-scroll">
+            <table>
+                <thead>
+                <tr><th>Código</th><th>Nombre</th><th>Ubicación</th><th>Instalación</th><th>Sismos</th><th>Estado</th><th>Acciones</th></tr>
+                </thead>
+                <tbody>
+                <tr th:if="${estaciones.isEmpty()}"><td colspan="7" class="vacio">No hay estaciones registradas.</td></tr>
+                <tr th:each="e : ${estaciones}">
+                    <td th:text="${e.codigo}"></td>
+                    <td th:text="${e.nombre}"></td>
+                    <td th:text="${e.ubigeo.ubicacionCompleta}"></td>
+                    <td th:text="${#temporals.format(e.fechaInstalacion, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${sismosPorEstacion.get(e.id)} ?: 0"></td>
+                    <td><span class="badge" th:classappend="${e.activa} ? 'badge-activo' : 'badge-inactivo'" th:text="${e.estado}"></span></td>
+                    <td class="acciones-tabla"><a th:href="@{/estaciones/{id}/editar(id=${e.id})}">Editar</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

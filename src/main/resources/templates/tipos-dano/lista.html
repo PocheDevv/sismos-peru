@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Tipos de daño')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('danos')}"></div>
+<main class="contenedor">
+    <div class="encabezado">
+        <div>
+            <h1>Tipos de daño</h1>
+            <p class="subtitulo">Clasificación de los reportes de daño. Solo los tipos activos se pueden elegir en un reporte.</p>
+        </div>
+        <a class="boton" th:href="@{/tipos-dano/nuevo}">+ Nuevo tipo de daño</a>
+    </div>
+    <th:block th:replace="~{fragments/layout :: mensajes}"></th:block>
+    <section class="tarjeta">
+        <div class="tabla-scroll">
+            <table>
+                <thead>
+                <tr><th>Código</th><th>Nombre</th><th>Sector</th><th>Descripción</th><th>Estado</th><th>Acciones</th></tr>
+                </thead>
+                <tbody>
+                <tr th:if="${tipos.isEmpty()}"><td colspan="6" class="vacio">No hay tipos de daño. Importe tipo_dano.csv desde Importar CSV.</td></tr>
+                <tr th:each="t : ${tipos}">
+                    <td th:text="${t.codigo}"></td>
+                    <td th:text="${t.nombre}"></td>
+                    <td th:text="${t.sector}"></td>
+                    <td style="white-space: normal" th:text="${t.descripcion} ?: '—'"></td>
+                    <td><span class="badge" th:classappend="${t.activo} ? 'badge-activo' : 'badge-inactivo'" th:text="${t.estado}"></span></td>
+                    <td class="acciones-tabla">
+                        <form method="post" th:action="@{/tipos-dano/{id}/estado(id=${t.id})}">
+                            <button class="boton-enlace" type="submit" th:text="${t.activo} ? 'Desactivar' : 'Activar'"></button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

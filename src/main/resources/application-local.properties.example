@@ -1,0 +1,4 @@
+# Copie este archivo como application-local.properties (en esta misma carpeta)
+# y escriba su usuario y contraseña de MySQL. Ese archivo no se sube a GitHub.
+spring.datasource.username=root
+spring.datasource.password=su_contraseña

@@ -1,0 +1,5 @@
+codigo,nombre,color,prioridad,descripcion,estado
+INFO,Informativa,VERDE,1,Evento registrado sin afectación confirmada.,ACTIVO
+PREV,Preventiva,AMARILLO,2,Evento que requiere monitoreo y comunicación preventiva.,ACTIVO
+ALER,Alerta,NARANJA,3,Evento con posible afectación que requiere coordinación.,ACTIVO
+EMER,Emergencia,ROJO,4,Evento con afectación confirmada que requiere respuesta inmediata.,ACTIVO

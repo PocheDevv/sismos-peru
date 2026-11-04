@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Ubigeos')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('ubigeos')}"></div>
+<main class="contenedor">
+    <p class="breadcrumb">
+        <a th:href="@{/ubigeos}">Ubigeos</a>
+        <th:block th:if="${padre != null}">
+            <th:block th:each="u : ${padre.ruta}"> / <a th:href="@{/ubigeos(padreId=${u.id})}" th:text="${u.nombre}"></a></th:block>
+        </th:block>
+    </p>
+    <div class="encabezado">
+        <div>
+            <h1 th:text="${padre == null} ? 'Departamentos' : (${tipoHijo != null} ? ${tipoHijo.nombre} + 's de ' + ${padre.nombre} : ${padre.nombre})"></h1>
+            <p class="subtitulo" th:if="${padre == null}">Catálogo de ubigeos INEI. Los departamentos se cargan desde ubigeo.csv (Importar CSV).</p>
+            <p class="subtitulo" th:if="${padre != null}" th:text="${padre.tipo.nombre} + ' · ubigeo ' + ${padre.codigo} + ' · ' + ${padre.estado}"></p>
+        </div>
+        <a class="boton" th:if="${tipoHijo != null}" th:href="@{/ubigeos/nuevo(padreId=${padre?.id})}"
+           th:text="${padre == null} ? '+ Nuevo departamento' : '+ Nueva ' + ${#strings.toLowerCase(tipoHijo.nombre)}"></a>
+    </div>
+
+    <th:block th:replace="~{fragments/layout :: mensajes}"></th:block>
+
+    <section class="tarjeta">
+        <div class="tabla-scroll">
+            <table>
+                <thead>
+                <tr><th>Código</th><th>Nombre</th><th>Tipo</th><th>Estado</th><th>Acciones</th></tr>
+                </thead>
+                <tbody>
+                <tr th:if="${ubigeos.isEmpty()}">
+                    <td colspan="5" class="vacio" th:text="${padre == null} ? 'No hay ubigeos. Importe ubigeo.csv desde Importar CSV.' : 'No hay registros en este nivel.'"></td>
+                </tr>
+                <tr th:each="u : ${ubigeos}">
+                    <td th:text="${u.codigo}"></td>
+                    <td>
+                        <a th:if="${u.tipo.tipoHijo != null}" th:href="@{/ubigeos(padreId=${u.id})}" th:text="${u.nombre}"></a>
+                        <span th:unless="${u.tipo.tipoHijo != null}" th:text="${u.nombre}"></span>
+                    </td>
+                    <td th:text="${u.tipo.nombre}"></td>
+                    <td><span class="badge" th:classappend="${u.activo} ? 'badge-activo' : 'badge-inactivo'" th:text="${u.estado}"></span></td>
+                    <td class="acciones-tabla">
+                        <a th:if="${u.tipo.tipoHijo != null}" th:href="@{/ubigeos(padreId=${u.id})}"
+                           th:text="'Ver ' + ${#strings.toLowerCase(u.tipo.tipoHijo.nombre)} + 's'"></a>
+                        <a th:href="@{/ubigeos/{id}/editar(id=${u.id})}">Editar</a>
+                        <a class="enlace-peligro" th:href="@{/ubigeos/{id}/eliminar(id=${u.id})}">Eliminar</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

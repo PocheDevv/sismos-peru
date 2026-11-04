@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Eliminar sismo')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('sismos')}"></div>
+<main class="contenedor">
+    <p class="breadcrumb"><a th:href="@{/sismos}">Sismos</a> /
+        <a th:href="@{/sismos/{id}(id=${sismo.id})}" th:text="${sismo.codigo}"></a> / Eliminar</p>
+
+    <section class="tarjeta confirmacion">
+        <th:block th:replace="~{fragments/layout :: mensajes}"></th:block>
+        <h1>¿Eliminar el sismo <span th:text="${sismo.codigo}"></span>?</h1>
+        <p class="subtitulo">Esta acción no se puede deshacer.</p>
+
+        <div class="resumen">
+            <div><span>Fecha y hora</span><strong th:text="${#temporals.format(sismo.fechaHora, 'dd/MM/yyyy HH:mm')}"></strong></div>
+            <div><span>Magnitud</span><strong th:text="'M ' + ${sismo.magnitud}"></strong></div>
+            <div><span>Ubicación</span><strong th:text="${sismo.ubigeo.ubicacionCompleta}"></strong></div>
+            <div><span>Estado</span><strong th:text="${sismo.estado}"></strong></div>
+        </div>
+
+        <div class="alerta alerta-error" th:if="${motivo != null}" th:text="${motivo}"></div>
+        <p th:if="${motivo == null and reportes > 0}" class="alerta alerta-error"
+           th:text="'También se eliminarán sus ' + ${reportes} + ' reporte(s) de daño.'"></p>
+
+        <form method="post" th:action="@{/sismos/{id}/eliminar(id=${sismo.id})}" class="acciones">
+            <button class="boton boton-eliminar" type="submit" th:if="${motivo == null}">Sí, eliminar</button>
+            <a class="boton-secundario" th:href="@{/sismos/{id}(id=${sismo.id})}">Cancelar</a>
+        </form>
+    </section>
+</main>
+</body>
+</html>

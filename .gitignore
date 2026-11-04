@@ -1,25 +1,11 @@
-# Maven
-/target/
-
-# NetBeans
-/nbproject/private/
-/nbactions.xml
-
-# IntelliJ IDEA
+target/
 .idea/
 *.iml
-out/
-
-# Eclipse / VS Code
-.classpath
-.project
-.settings/
 .vscode/
-
-# Sistema operativo
 .DS_Store
-Thumbs.db
 .smarttomcat/
+nbactions.xml
+nb-configuration.xml
 
-# Configuración local de la base de datos (contraseñas)
-src/main/resources/db-local.properties
+# Configuración local con la contraseña de MySQL de cada integrante
+src/main/resources/application-local.properties

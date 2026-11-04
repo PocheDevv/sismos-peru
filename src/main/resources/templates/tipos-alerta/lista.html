@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Tipos de alerta')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('alertas')}"></div>
+<main class="contenedor">
+    <div class="encabezado">
+        <div>
+            <h1>Tipos de alerta</h1>
+            <p class="subtitulo">Clasificación de cada sismo. Solo las alertas activas se pueden elegir al registrar un sismo.</p>
+        </div>
+        <a class="boton" th:href="@{/tipos-alerta/nuevo}">+ Nuevo tipo de alerta</a>
+    </div>
+    <th:block th:replace="~{fragments/layout :: mensajes}"></th:block>
+    <section class="tarjeta">
+        <div class="tabla-scroll">
+            <table>
+                <thead>
+                <tr><th>Prioridad</th><th>Código</th><th>Nombre</th><th>Color</th><th>Descripción</th><th>Estado</th><th>Acciones</th></tr>
+                </thead>
+                <tbody>
+                <tr th:if="${tipos.isEmpty()}"><td colspan="7" class="vacio">No hay tipos de alerta. Importe tipo_alerta.csv desde Importar CSV.</td></tr>
+                <tr th:each="t : ${tipos}">
+                    <td th:text="${t.prioridad}"></td>
+                    <td th:text="${t.codigo}"></td>
+                    <td th:text="${t.nombre}"></td>
+                    <td><span th:class="${t.claseColor}" th:text="${t.color}"></span></td>
+                    <td style="white-space: normal" th:text="${t.descripcion} ?: '—'"></td>
+                    <td><span class="badge" th:classappend="${t.activo} ? 'badge-activo' : 'badge-inactivo'" th:text="${t.estado}"></span></td>
+                    <td class="acciones-tabla">
+                        <form method="post" th:action="@{/tipos-alerta/{id}/estado(id=${t.id})}">
+                            <button class="boton-enlace" type="submit" th:text="${t.activo} ? 'Desactivar' : 'Activar'"></button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>
