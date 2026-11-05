@@ -40,8 +40,8 @@ Curso Desarrollo de Aplicaciones Empresariales Avanzado · NRC 3703 · Grupo 6.
 | 3 | HU-13 | Consultar reportes de afectación | Víctor | ✅ |
 | 3 | HU-25 | Editar un reporte de afectación | Víctor | ✅ |
 | 3 | HU-26 | Actualizar el estado de un reporte | Cristian | ✅ |
-| 3 | HU-29 | Marcar un sismo como relevante para seguimiento | Cristian | ⏳ |
-| 3 | HU-14 | Dar seguimiento a un sismo relevante | Cristian | ⏳ |
+| 3 | HU-29 | Marcar un sismo como relevante para seguimiento | Cristian | ✅ |
+| 3 | HU-14 | Dar seguimiento a un sismo relevante | Cristian | ✅ |
 | 3 | HU-28 | Ver el total de personas afectadas por sismo | Nick | ✅ |
 | 3 | HU-27 | Filtrar reportes por tipo, nivel y estado | Nick | ✅ |
 | PA3 | — | Migración a Spring Boot, catálogos e importación CSV | José | ✅ |
@@ -118,6 +118,10 @@ Reglas del equipo: una rama por HU desde `main` actualizado, Pull Request para u
 |---|---|
 | `/sismos` | Lista con búsqueda, filtros, orden y paginación (HU-01, 15, 30, 31) |
 | `/sismos/nuevo`, `/sismos/{id}`, `/sismos/{id}/editar`, `/sismos/{id}/eliminar` | Registrar, detalle, editar, eliminar |
+| `/sismos/{id}/relevante` (POST) | Marcar o quitar un sismo relevante (HU-29) |
+| `/sismos/{id}/reportes/nuevo`, `/sismos/{id}/reportes/{r}/editar`, `/sismos/{id}/reportes/{r}/estado` | Registrar, editar y cambiar estado de un reporte (HU-12, HU-25, HU-26) |
+| `/reportes` | Reportes de afectación con filtros por tipo, nivel y estado (HU-13, HU-27) |
+| `/sismos/{id}/seguimientos/nuevo` | Registrar el seguimiento de un sismo relevante (HU-14) |
 | `/ubigeos?padreId=` | Ubigeos por nivel; nuevo, editar y eliminar (HU-09) |
 | `/estaciones` | Estaciones de monitoreo (HU-10, HU-11) |
 | `/tipos-alerta`, `/tipos-dano` | Maestros: listar, registrar, activar o desactivar |

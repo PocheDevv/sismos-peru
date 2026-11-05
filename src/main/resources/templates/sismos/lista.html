@@ -101,7 +101,8 @@
                     </td>
                 </tr>
                 <tr th:each="s : ${sismos}">
-                    <td><a th:href="@{/sismos/{id}(id=${s.id})}" th:text="${s.codigo}"></a></td>
+                    <td><a th:href="@{/sismos/{id}(id=${s.id})}" th:text="${s.codigo}"></a>
+                        <span th:if="${s.relevante}" class="badge badge-relevante">Relevante</span></td>
                     <td th:text="${#temporals.format(s.fechaHora, 'dd/MM/yyyy HH:mm')}"></td>
                     <td th:text="'M ' + ${#numbers.formatDecimal(s.magnitud, 1, 1)}"></td>
                     <td th:text="${#numbers.formatDecimal(s.profundidad, 1, 0)} + ' km'"></td>

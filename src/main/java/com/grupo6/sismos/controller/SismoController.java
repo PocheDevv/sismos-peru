@@ -3,6 +3,7 @@ package com.grupo6.sismos.controller;
 import com.grupo6.sismos.entity.Sismo;
 import com.grupo6.sismos.service.EstacionService;
 import com.grupo6.sismos.service.ReporteDanoService;
+import com.grupo6.sismos.service.SeguimientoService;
 import com.grupo6.sismos.service.SismoService;
 import com.grupo6.sismos.service.TipoAlertaService;
 import com.grupo6.sismos.service.UbigeoService;
@@ -17,7 +18,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/** HU-01 a HU-08, HU-11, HU-15, HU-30 y HU-31. */
+/** HU-01 a HU-08, HU-11, HU-15, HU-29, HU-30 y HU-31. */
 @Controller
 @RequestMapping("/sismos")
 public class SismoController {
@@ -27,15 +28,17 @@ public class SismoController {
     private final TipoAlertaService tipoAlertaService;
     private final EstacionService estacionService;
     private final ReporteDanoService reporteDanoService;
+    private final SeguimientoService seguimientoService;
 
     public SismoController(SismoService sismoService, UbigeoService ubigeoService,
                            TipoAlertaService tipoAlertaService, EstacionService estacionService,
-                           ReporteDanoService reporteDanoService) {
+                           ReporteDanoService reporteDanoService, SeguimientoService seguimientoService) {
         this.sismoService = sismoService;
         this.ubigeoService = ubigeoService;
         this.tipoAlertaService = tipoAlertaService;
         this.estacionService = estacionService;
         this.reporteDanoService = reporteDanoService;
+        this.seguimientoService = seguimientoService;
     }
 
     @GetMapping
@@ -79,7 +82,23 @@ public class SismoController {
         model.addAttribute("sismo", sismoService.buscarPorId(id));
         model.addAttribute("reportes", reporteDanoService.listarPorSismo(id));
         model.addAttribute("totalAfectados", reporteDanoService.totalAfectadosPorSismo(id));
+        model.addAttribute("seguimientos", seguimientoService.listarPorSismo(id));
         return "sismos/detalle";
+    }
+
+    /** HU-29: marcar (relevante=true) o desmarcar (relevante=false) desde el detalle. */
+    @PostMapping("/{id}/relevante")
+    public String cambiarRelevancia(@PathVariable Long id, @RequestParam boolean relevante,
+                                    RedirectAttributes redirect) {
+        try {
+            Sismo sismo = sismoService.cambiarRelevancia(id, relevante);
+            redirect.addFlashAttribute("exito", relevante
+                    ? "Sismo " + sismo.getCodigo() + " marcado como relevante. Su estado pasó a En seguimiento."
+                    : "Sismo " + sismo.getCodigo() + " ya no es relevante. Su estado es " + sismo.getEstado() + ".");
+        } catch (ReglaNegocioException error) {
+            redirect.addFlashAttribute("error", error.getMessage());
+        }
+        return "redirect:/sismos/" + id;
     }
 
     @GetMapping("/{id}/editar")

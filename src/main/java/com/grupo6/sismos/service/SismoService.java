@@ -135,6 +135,35 @@ public class SismoService {
         return sismoRepository.save(sismo);
     }
 
+    /**
+     * HU-29: marca o desmarca un sismo como relevante para seguimiento.
+     * Al marcarlo pasa a En seguimiento; al desmarcarlo, si estaba En seguimiento, vuelve a En evaluación.
+     */
+    @Transactional
+    public Sismo cambiarRelevancia(Long id, boolean relevante) {
+        Sismo sismo = buscarPorId(id);
+        if (relevante) {
+            if (sismo.isRelevante()) {
+                throw new ReglaNegocioException(null, "El sismo " + sismo.getCodigo() + " ya está marcado como relevante.");
+            }
+            if (Sismo.ESTADO_CERRADO.equals(sismo.getEstado())) {
+                throw new ReglaNegocioException(null, "El sismo " + sismo.getCodigo()
+                        + " está Cerrado y no se puede marcar como relevante.");
+            }
+            sismo.setRelevante(true);
+            sismo.setEstado(Sismo.ESTADO_EN_SEGUIMIENTO);
+        } else {
+            if (!sismo.isRelevante()) {
+                throw new ReglaNegocioException(null, "El sismo " + sismo.getCodigo() + " no está marcado como relevante.");
+            }
+            sismo.setRelevante(false);
+            if (sismo.isEnSeguimiento()) {
+                sismo.setEstado(Sismo.ESTADO_EN_EVALUACION);
+            }
+        }
+        return sismoRepository.save(sismo);
+    }
+
     /** HU-07: un sismo En seguimiento no se puede eliminar. Null si se puede. */
     public String motivoParaNoEliminar(Sismo sismo) {
         if (sismo.isEnSeguimiento()) {

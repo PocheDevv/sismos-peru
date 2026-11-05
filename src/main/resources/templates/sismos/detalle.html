@@ -9,10 +9,17 @@
 
             <div class="encabezado">
                 <div>
-                    <h1>Sismo <span th:text="${sismo.codigo}"></span> <span th:class="${sismo.claseEstado}" th:text="${sismo.estado}"></span></h1>
+                    <h1>Sismo <span th:text="${sismo.codigo}"></span> <span th:class="${sismo.claseEstado}" th:text="${sismo.estado}"></span>
+                        <span th:if="${sismo.relevante}" class="badge badge-relevante">Relevante</span></h1>
                     <p class="subtitulo" th:text="${sismo.ubigeo.ubicacionCompleta}"></p>
                 </div>
                 <div class="acciones">
+                    <form method="post" th:action="@{/sismos/{id}/relevante(id=${sismo.id})}"
+                          th:if="${sismo.relevante or sismo.estado != 'Cerrado'}">
+                        <input type="hidden" name="relevante" th:value="${!sismo.relevante}">
+                        <button type="submit" class="boton-secundario"
+                                th:text="${sismo.relevante} ? 'Quitar de seguimiento' : 'Marcar como relevante'"></button>
+                    </form>
                     <a class="boton" th:href="@{/sismos/{id}/editar(id=${sismo.id})}">Editar</a>
                     <a class="boton-peligro" th:href="@{/sismos/{id}/eliminar(id=${sismo.id})}">Eliminar</a>
                     <a class="boton-secundario" th:href="@{/sismos}">Volver a la lista</a>
@@ -84,7 +91,32 @@
                 </div>
             </section>
 
-            <!-- Sprint 3: aquí van los reportes de daño del sismo (HU-12, HU-13, HU-28) y su seguimiento (HU-29, HU-14). -->
+            <!-- HU-14: bitácora de seguimiento (solo sismos relevantes o que ya tienen seguimientos) -->
+            <section class="tarjeta" th:if="${sismo.relevante or !seguimientos.isEmpty()}">
+                <div class="barra-resultados">
+                    <h2 class="titulo-tarjeta" th:text="'Seguimiento del sismo (' + ${seguimientos.size()} + ')'"></h2>
+                    <a class="boton-secundario" th:if="${sismo.relevante and sismo.estado != 'Cerrado'}"
+                       th:href="@{/sismos/{id}/seguimientos/nuevo(id=${sismo.id})}">+ Registrar seguimiento</a>
+                </div>
+                <div class="tabla-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>Fecha</th><th>Responsable</th><th>Observaciones</th><th>Acciones realizadas</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${seguimientos.isEmpty()}">
+                                <td colspan="4" class="vacio">Aún no hay seguimientos registrados para este sismo.</td>
+                            </tr>
+                            <tr th:each="s : ${seguimientos}">
+                                <td th:text="${#temporals.format(s.fechaActualizacion, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td class="texto-ajustable" th:text="${s.responsable}"></td>
+                                <td class="texto-largo" th:text="${s.observaciones}"></td>
+                                <td class="texto-largo" th:text="${s.accionesRealizadas}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </main>
     </body>
 </html>
