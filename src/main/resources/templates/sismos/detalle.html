@@ -65,12 +65,12 @@
                                 <td th:text="${#numbers.formatInteger(r.cantidadAfectada, 1, 'COMMA')}"></td>
                                 <td><span th:class="${r.claseNivel}" th:text="${r.nivel}"></span></td>
                                 <td>
-                                    <form th:action="@{/sismos/{sId}/reportes/{rId}/estado(sId=${sismo.id}, rId=${r.id})}" method="post">
-                                        <select name="estado" class="form-select form-select-sm" onchange="this.form.submit()">
-                                            <option value="PENDIENTE" th:selected="${r.estado == 'PENDIENTE'}">PENDIENTE</option>
-                                            <option value="VERIFICADO" th:selected="${r.estado == 'VERIFICADO'}">VERIFICADO</option>
-                                            <option value="CERRADO" th:selected="${r.estado == 'CERRADO'}">CERRADO</option>
-                                        </select>
+                                    <span th:class="${r.claseEstado}" th:text="${r.estado}"></span>
+                                    <form th:unless="${r.cerrado}" class="form-estado" method="post"
+                                          th:action="@{/sismos/{s}/reportes/{id}/estado(s=${sismo.id}, id=${r.id})}">
+                                        <input type="hidden" name="estado" th:value="${r.siguienteEstado}">
+                                        <button type="submit" class="boton-enlace"
+                                                th:text="${r.siguienteEstado == 'VERIFICADO'} ? 'Verificar' : 'Cerrar'"></button>
                                     </form>
                                 </td>
                                 <td class="texto-largo" th:text="${r.descripcion}"></td>

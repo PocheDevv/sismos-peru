@@ -39,7 +39,7 @@ Curso Desarrollo de Aplicaciones Empresariales Avanzado · NRC 3703 · Grupo 6.
 | 3 | HU-12 | Registrar reportes de afectación (daño) | Víctor | ✅ |
 | 3 | HU-13 | Consultar reportes de afectación | Víctor | ✅ |
 | 3 | HU-25 | Editar un reporte de afectación | Víctor | ✅ |
-| 3 | HU-26 | Actualizar el estado de un reporte | Cristian | ⏳ |
+| 3 | HU-26 | Actualizar el estado de un reporte | Cristian | ✅ |
 | 3 | HU-29 | Marcar un sismo como relevante para seguimiento | Cristian | ⏳ |
 | 3 | HU-14 | Dar seguimiento a un sismo relevante | Cristian | ⏳ |
 | 3 | HU-28 | Ver el total de personas afectadas por sismo | Nick | ✅ |

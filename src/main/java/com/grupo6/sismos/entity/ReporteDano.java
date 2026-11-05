@@ -49,6 +49,15 @@ public class ReporteDano {
         return ESTADO_CERRADO.equals(estado);
     }
 
+    /** Estado al que puede pasar el reporte (HU-26), o null si ya está CERRADO. */
+    public String getSiguienteEstado() {
+        return switch (estado) {
+            case ESTADO_PENDIENTE -> ESTADO_VERIFICADO;
+            case ESTADO_VERIFICADO -> ESTADO_CERRADO;
+            default -> null;
+        };
+    }
+
     public String getClaseNivel() {
         return "badge badge-nivel-" + (nivel == null ? "medio" : nivel.toLowerCase());
     }

@@ -80,7 +80,6 @@ public class ReporteDanoService {
         }
         return resultado;
     }
-    
 
     private Long validarTipoDano(ReporteDanoFiltro filtro) {
         String valor = filtro.getTipoDanoId();
@@ -200,7 +199,6 @@ public class ReporteDanoService {
         form.setCantidadAfectada(reporte.getCantidadAfectada());
         form.setDescripcion(reporte.getDescripcion());
         form.setNivel(reporte.getNivel());
-        form.setEstado(reporte.getEstado());
         return form;
     }
 
@@ -215,9 +213,6 @@ public class ReporteDanoService {
         if (!ReporteDano.NIVELES.contains(form.getNivel())) {
             throw new ReglaNegocioException("nivel", "Seleccione un nivel de afectación válido.");
         }
-        if (!ReporteDano.ESTADOS.contains(form.getEstado())) {
-        throw new ReglaNegocioException("estado", "Seleccione un estado válido.");
-        }
         String errorFecha = errorFechaReporte(reporte.getSismo(), form.getFechaReporte());
         if (errorFecha != null) {
             throw new ReglaNegocioException("fechaReporte", errorFecha);
@@ -227,18 +222,29 @@ public class ReporteDanoService {
         reporte.setCantidadAfectada(form.getCantidadAfectada());
         reporte.setDescripcion(form.getDescripcion().trim());
         reporte.setNivel(form.getNivel());
-        reporte.setEstado(form.getEstado());
     }
-    
+
+    /**
+     * HU-26: el estado de un reporte solo avanza un paso: PENDIENTE → VERIFICADO → CERRADO.
+     * Un reporte CERRADO ya no cambia.
+     */
     @Transactional
-    public void actualizarEstado(Long sismoId, Long id, String nuevoEstado) {
+    public ReporteDano actualizarEstado(Long sismoId, Long id, String nuevoEstado) {
         ReporteDano reporte = buscarReporte(sismoId, id);
-        
-        if (!ReporteDano.ESTADOS.contains(nuevoEstado)) {
-            throw new ReglaNegocioException("estado", "El estado seleccionado no es válido.");
+        if (nuevoEstado == null || !ReporteDano.ESTADOS.contains(nuevoEstado)) {
+            throw new ReglaNegocioException(null, "El estado seleccionado no es válido.");
         }
-        
+        if (reporte.isCerrado()) {
+            throw new ReglaNegocioException(null, "El reporte está CERRADO y su estado ya no se puede cambiar.");
+        }
+        if (nuevoEstado.equals(reporte.getEstado())) {
+            throw new ReglaNegocioException(null, "El reporte ya se encuentra en estado " + nuevoEstado + ".");
+        }
+        if (!nuevoEstado.equals(reporte.getSiguienteEstado())) {
+            throw new ReglaNegocioException(null, "Un reporte " + reporte.getEstado() + " solo puede pasar a "
+                    + reporte.getSiguienteEstado() + ".");
+        }
         reporte.setEstado(nuevoEstado);
-        reporteDanoRepository.save(reporte);
+        return reporteDanoRepository.save(reporte);
     }
 }

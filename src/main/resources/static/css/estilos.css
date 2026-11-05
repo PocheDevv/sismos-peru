@@ -127,6 +127,7 @@ th a:hover { color: #111827; }
 .badge-nivel-critico { background: #fee2e2; color: #991b1b; }
 .tabla-scroll td.texto-largo { white-space: normal; min-width: 220px; }
 .tabla-scroll td.texto-ajustable { white-space: normal; min-width: 140px; }
+.form-estado { display: inline; margin-left: 8px; }
 
 /* Importación CSV */
 .columnas-esperadas { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #374151; }
