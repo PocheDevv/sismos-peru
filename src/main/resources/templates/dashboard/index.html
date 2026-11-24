@@ -65,6 +65,22 @@
         </a>
     </section>
 
+    <section class="graficos">
+        <div class="tarjeta">
+            <h2 class="titulo-tarjeta">Sismos por mes</h2>
+            <div class="grafico-contenedor">
+                <canvas id="sismosPorMes" role="img" aria-label="Gráfico de barras con la cantidad de sismos por mes del periodo"></canvas>
+            </div>
+        </div>
+        <div class="tarjeta">
+            <h2 class="titulo-tarjeta">Afectados por tipo de daño</h2>
+            <div class="grafico-contenedor" th:unless="${etiquetasTipos.isEmpty()}">
+                <canvas id="afectadosPorTipo" role="img" aria-label="Gráfico de dona con el total de afectados por tipo de daño"></canvas>
+            </div>
+            <p class="vacio" th:if="${etiquetasTipos.isEmpty()}">No hay reportes de afectación para los sismos del periodo.</p>
+        </div>
+    </section>
+
     <section class="tarjeta">
         <h2 class="titulo-tarjeta">Definición de los indicadores</h2>
         <div class="tabla-scroll">
@@ -106,5 +122,16 @@
         </div>
     </section>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script th:inline="javascript">
+    const etiquetasMeses = /*[[${etiquetasMeses}]]*/ [];
+    const valoresMeses = /*[[${valoresMeses}]]*/ [];
+    const etiquetasTipos = /*[[${etiquetasTipos}]]*/ [];
+    const valoresTipos = /*[[${valoresTipos}]]*/ [];
+    new Chart(document.getElementById('sismosPorMes'), {type: 'bar', data: {labels: etiquetasMeses, datasets: [{label: 'Sismos', data: valoresMeses, backgroundColor: '#2563eb', borderRadius: 6}]}, options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}}, scales: {y: {beginAtZero: true, ticks: {precision: 0}}}}});
+    if (etiquetasTipos.length > 0) {
+        new Chart(document.getElementById('afectadosPorTipo'), {type: 'doughnut', data: {labels: etiquetasTipos, datasets: [{label: 'Afectados', data: valoresTipos, backgroundColor: ['#2563eb', '#16a34a', '#eab308', '#ea580c', '#dc2626', '#7c3aed', '#0891b2']}]}, options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {position: 'bottom'}}}});
+    }
+</script>
 </body>
 </html>
