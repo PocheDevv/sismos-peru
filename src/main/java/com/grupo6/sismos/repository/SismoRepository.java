@@ -1,5 +1,6 @@
 package com.grupo6.sismos.repository;
 
+import com.grupo6.sismos.dto.reporte.SismosPorMesDto;
 import com.grupo6.sismos.entity.Sismo;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,4 +38,16 @@ public interface SismoRepository extends JpaRepository<Sismo, Long>, JpaSpecific
             """)
     Double magnitudMaximaEnPeriodo(@Param("desde") LocalDateTime desde, @Param("hasta") LocalDateTime hasta,
                                    @Param("departamento") String departamento);
+
+    @Query("""
+            SELECT new com.grupo6.sismos.dto.reporte.SismosPorMesDto(
+                YEAR(s.fechaHora), MONTH(s.fechaHora), COUNT(s))
+            FROM Sismo s
+            WHERE s.fechaHora >= :desde AND s.fechaHora < :hasta
+              AND (:departamento IS NULL OR s.ubigeo.codigo LIKE CONCAT(:departamento, '%'))
+            GROUP BY YEAR(s.fechaHora), MONTH(s.fechaHora)
+            ORDER BY YEAR(s.fechaHora), MONTH(s.fechaHora)
+            """)
+    List<SismosPorMesDto> contarPorMes(@Param("desde") LocalDateTime desde, @Param("hasta") LocalDateTime hasta,
+                                       @Param("departamento") String departamento);
 }

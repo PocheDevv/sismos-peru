@@ -167,3 +167,7 @@ th a:hover { color: #111827; }
 .kpi-ayuda { font-size: 12px; color: #9ca3af; }
 @media (max-width: 900px) { .kpis { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 520px) { .kpis { grid-template-columns: 1fr; } }
+.graficos { display: grid; grid-template-columns: 7fr 5fr; gap: 20px; }
+.graficos .tarjeta { margin-bottom: 20px; }
+.grafico-contenedor { position: relative; height: 300px; }
+@media (max-width: 900px) { .graficos { grid-template-columns: 1fr; } }

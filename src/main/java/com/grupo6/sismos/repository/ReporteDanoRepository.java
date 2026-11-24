@@ -1,5 +1,6 @@
 package com.grupo6.sismos.repository;
 
+import com.grupo6.sismos.dto.reporte.AfectadosPorTipoDto;
 import com.grupo6.sismos.entity.ReporteDano;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,6 +45,18 @@ public interface ReporteDanoRepository extends JpaRepository<ReporteDano, Long> 
             """)
     long contarPorEstadoEnPeriodo(@Param("estado") String estado, @Param("desde") LocalDateTime desde,
                                   @Param("hasta") LocalDateTime hasta, @Param("departamento") String departamento);
+
+    @Query("""
+            SELECT new com.grupo6.sismos.dto.reporte.AfectadosPorTipoDto(r.tipoDano.nombre, SUM(r.cantidadAfectada))
+            FROM ReporteDano r
+            WHERE r.sismo.fechaHora >= :desde AND r.sismo.fechaHora < :hasta
+              AND (:departamento IS NULL OR r.sismo.ubigeo.codigo LIKE CONCAT(:departamento, '%'))
+            GROUP BY r.tipoDano.nombre
+            ORDER BY SUM(r.cantidadAfectada) DESC
+            """)
+    List<AfectadosPorTipoDto> sumarAfectadosPorTipo(@Param("desde") LocalDateTime desde,
+                                                    @Param("hasta") LocalDateTime hasta,
+                                                    @Param("departamento") String departamento);
 
     long countBySismoId(Long sismoId);
 
