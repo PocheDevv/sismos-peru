@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('dashboard')}"></div>
+<main class="contenedor">
+    <div class="encabezado">
+        <div>
+            <h1>Dashboard</h1>
+            <p class="subtitulo">Actividad sísmica e impacto reportado para apoyar la toma de decisiones.</p>
+        </div>
+    </div>
+
+    <div class="alerta alerta-error" th:if="${!filtro.avisos.isEmpty()}">
+        <div th:each="aviso : ${filtro.avisos}" th:text="${aviso}"></div>
+    </div>
+
+    <section class="tarjeta">
+        <form method="get" th:action="@{/dashboard}" class="filtros">
+            <label>
+                <span>Desde</span>
+                <input name="desde" type="date" th:value="${filtro.desde}">
+            </label>
+            <label>
+                <span>Hasta</span>
+                <input name="hasta" type="date" th:value="${filtro.hasta}">
+            </label>
+            <label>
+                <span>Departamento</span>
+                <select name="departamentoId">
+                    <option value="">Todos</option>
+                    <option th:each="d : ${departamentos}" th:value="${d.id}" th:text="${d.nombre}"
+                            th:selected="${d.id == filtro.departamentoId}"></option>
+                </select>
+            </label>
+            <div class="acciones">
+                <button class="boton" type="submit">Aplicar filtro</button>
+                <a class="boton-secundario" th:href="@{/dashboard}">Últimos 12 meses</a>
+            </div>
+        </form>
+    </section>
+
+    <p class="nota" th:text="'Periodo: ' + ${#temporals.format(filtro.desde, 'dd/MM/yyyy')} + ' al ' + ${#temporals.format(filtro.hasta, 'dd/MM/yyyy')}"></p>
+
+    <section class="kpis">
+        <a class="kpi" th:href="@{/sismos(desde=${filtro.desde}, hasta=${filtro.hasta}, departamentoId=${filtro.departamentoId})}">
+            <span class="kpi-titulo">Sismos registrados</span>
+            <strong class="kpi-valor" th:text="${#numbers.formatInteger(kpis.sismosRegistrados, 1, 'COMMA')}">0</strong>
+            <span class="kpi-ayuda">Actividad sísmica del periodo</span>
+        </a>
+        <a class="kpi" th:href="@{/sismos(desde=${filtro.desde}, hasta=${filtro.hasta}, departamentoId=${filtro.departamentoId}, orden='magnitud', dir='desc')}">
+            <span class="kpi-titulo">Magnitud máxima</span>
+            <strong class="kpi-valor" th:text="${kpis.magnitudMaxima != null} ? 'M ' + ${#numbers.formatDecimal(kpis.magnitudMaxima, 1, 1)} : '—'">—</strong>
+            <span class="kpi-ayuda">El evento más fuerte del periodo</span>
+        </a>
+        <a class="kpi" th:href="@{/reportes}">
+            <span class="kpi-titulo">Total de afectados</span>
+            <strong class="kpi-valor" th:text="${#numbers.formatInteger(kpis.totalAfectados, 1, 'COMMA')}">0</strong>
+            <span class="kpi-ayuda">Suma de la cantidad afectada · Ver todos los reportes</span>
+        </a>
+        <a class="kpi" th:href="@{/reportes(estado='PENDIENTE')}">
+            <span class="kpi-titulo">Reportes pendientes</span>
+            <strong class="kpi-valor" th:text="${#numbers.formatInteger(kpis.reportesPendientes, 1, 'COMMA')}">0</strong>
+            <span class="kpi-ayuda">Daños por verificar · Ver todos los pendientes</span>
+        </a>
+    </section>
+
+    <section class="tarjeta">
+        <h2 class="titulo-tarjeta">Definición de los indicadores</h2>
+        <div class="tabla-scroll">
+            <table>
+                <thead>
+                <tr><th>Indicador</th><th>Qué mide</th><th>Cómo se calcula</th><th>Fuente</th><th>Decisión que apoya</th></tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Sismos registrados</td>
+                    <td class="texto-ajustable">Actividad sísmica del periodo</td>
+                    <td class="texto-ajustable">Cantidad de sismos con fecha y hora dentro del periodo</td>
+                    <td>sismo</td>
+                    <td class="texto-ajustable">Dónde reforzar el monitoreo o instalar estaciones</td>
+                </tr>
+                <tr>
+                    <td>Magnitud máxima</td>
+                    <td class="texto-ajustable">El evento más fuerte del periodo</td>
+                    <td class="texto-ajustable">Mayor magnitud entre los sismos del periodo</td>
+                    <td>sismo</td>
+                    <td class="texto-ajustable">Si se activa una respuesta de emergencia</td>
+                </tr>
+                <tr>
+                    <td>Total de afectados</td>
+                    <td class="texto-ajustable">Impacto acumulado (viviendas, personas o elementos)</td>
+                    <td class="texto-ajustable">Suma de la cantidad afectada de los reportes de esos sismos</td>
+                    <td>reporte_dano + sismo</td>
+                    <td class="texto-ajustable">Cuánta ayuda humanitaria enviar y a dónde</td>
+                </tr>
+                <tr>
+                    <td>Reportes pendientes</td>
+                    <td class="texto-ajustable">Trabajo de verificación atrasado</td>
+                    <td class="texto-ajustable">Cantidad de reportes en estado PENDIENTE de esos sismos</td>
+                    <td>reporte_dano + sismo</td>
+                    <td class="texto-ajustable">Cuánto personal asignar para verificar daños</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

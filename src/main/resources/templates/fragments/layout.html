@@ -12,6 +12,7 @@
 <div th:fragment="barra(seccion)" class="barra-superior">
     <span class="marca">SismosPerú <span>Sistema de Gestión de Sismos</span></span>
     <nav class="menu">
+        <a th:href="@{/dashboard}" th:classappend="${seccion == 'dashboard'} ? 'activo'">Dashboard</a>
         <a th:href="@{/sismos}" th:classappend="${seccion == 'sismos'} ? 'activo'">Sismos</a>
         <a th:href="@{/reportes}" th:classappend="${seccion == 'reportes'} ? 'activo'">Reportes</a>
         <a th:href="@{/ubigeos}" th:classappend="${seccion == 'ubigeos'} ? 'activo'">Ubigeos</a>
