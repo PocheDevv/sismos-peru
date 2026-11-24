@@ -75,6 +75,11 @@ public class Sismo {
         return ESTADO_EN_SEGUIMIENTO.equals(estado);
     }
 
+    public boolean isTieneCoordenadasValidas() {
+        return Double.isFinite(latitud) && latitud >= -90 && latitud <= 90
+                && Double.isFinite(longitud) && longitud >= -180 && longitud <= 180;
+    }
+
     /** Clase CSS del badge de estado. */
     public String getClaseEstado() {
         return switch (estado) {

@@ -77,10 +77,14 @@ Son credenciales de laboratorio, solo para la demostración.
 | 4 | HU-40 | Consultar los registros rechazados de una importación | José | ✅ |
 | 4 | HU-16 | Ver indicadores del dashboard | Víctor | ⏳ |
 | 4 | HU-17 | Ver gráficos estadísticos | Víctor | ⏳ |
-| 4 | HU-42 | Elegir registros por página y ordenar listados | Nick | ⏳ |
+| 4 | HU-42 | Elegir tamaño de página y ordenar reportes de afectación | Nick | ✅ |
 | 4 | HU-24 | Ver los sismos registrados por una estación | Cristian | ⏳ |
 | 4 | HU-23 | Filtrar estaciones por departamento y estado | Cristian | ⏳ |
 | 4 | HU-22 | Proteger ubicaciones que están en uso | Cristian | ✅ |
+| 4 | HU-18 | Visualizar sismos en un mapa | — | ✅ |
+| 4 | HU-32 | Filtrar los sismos mostrados en el mapa | — | ✅ |
+| 4 | HU-33 | Identificar la magnitud en el marcador | — | ✅ |
+| 4 | HU-34 | Ver la ubicación del sismo en su detalle | — | ✅ |
 
 ## Modelo de datos
 
@@ -131,8 +135,14 @@ Ejemplos completos: `SismoController` + `SismoService` + `SismoForm` + `template
   `DashboardController` → `DashboardService` → consultas en los repositorios → DTOs en `dto/reporte`
   → Thymeleaf con Chart.js. Mínimo 4 KPI, 2 gráficos y un filtro por periodo y departamento.
   Agregar "Dashboard" al menú en `fragments/layout.html`. El usuario CONSULTA también lo ve.
-- **HU-42 (Nick) — Paginación configurable**: selector de 5, 10, 20 y 50 filas y orden por columna en
-  Sismos, Reportes y Ubigeos, como `tamanio` en la v2.3 del profe (el servicio lo limita entre 5 y 50).
+- **HU-42 — Reportes de afectación**: selector de 10, 25 y 50 filas y orden ascendente/descendente por
+  sismo, ubicación, fecha, tipo de daño, cantidad, nivel y estado. El tamaño, orden y filtros se conservan
+  al navegar entre páginas; cambiar los filtros, el tamaño o el orden vuelve a la primera página.
+- **HU-18, HU-32, HU-33 y HU-34 — Mapa de sismos**: `/sismos/mapa` reutiliza los filtros por departamento,
+  magnitud y fecha de HU-15, y el detalle incluye el mismo componente de mapa. Los marcadores muestran
+  magnitud a una cifra decimal: verde para M < 4, ámbar para M 4–5.9 y rojo para M ≥ 6. Leaflet y el mapa
+  base de OpenStreetMap se cargan desde CDN; si no hay conexión, el mapa informa que no pudo cargar y la
+  aplicación permanece utilizable.
 - **HU-24 y HU-23 (Cristian) — Estaciones**: sismos registrados por una estación y filtro de
   estaciones por departamento y estado, con paginación.
 
@@ -144,6 +154,7 @@ Reglas del equipo: una rama por HU desde `main` actualizado, Pull Request para u
 | Ruta | Qué hace |
 |---|---|
 | `/sismos` | Lista con búsqueda, filtros, orden y paginación (HU-01, 15, 30, 31) |
+| `/sismos/mapa` | Mapa de sismos, filtrable por departamento, magnitud y periodo (HU-18, HU-32, HU-33) |
 | `/sismos/nuevo`, `/sismos/{id}`, `/sismos/{id}/editar`, `/sismos/{id}/eliminar` | Registrar, detalle, editar, eliminar |
 | `/sismos/{id}/relevante` (POST) | Marcar o quitar un sismo relevante (HU-29) |
 | `/sismos/{id}/reportes/nuevo`, `/sismos/{id}/reportes/{r}/editar`, `/sismos/{id}/reportes/{r}/estado` | Registrar, editar y cambiar estado de un reporte (HU-12, HU-25, HU-26) |

@@ -37,6 +37,7 @@ public class ReporteDanoController {
         model.addAttribute("tiposDano", tipoDanoService.listar());
         model.addAttribute("niveles", ReporteDano.NIVELES);
         model.addAttribute("estados", ReporteDano.ESTADOS);
+        model.addAttribute("tamaniosPagina", ReporteDanoFiltro.TAMANIOS_PAGINA);
         return "reportes/lista";
     }
 

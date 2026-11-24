@@ -9,7 +9,10 @@
             <h1>Sismos registrados</h1>
             <p class="subtitulo">Eventos sísmicos reportados en el territorio peruano.</p>
         </div>
-        <a sec:authorize="hasRole('ADMIN')" class="boton" th:href="@{/sismos/nuevo}">+ Registrar sismo</a>
+        <div class="acciones">
+            <a class="boton-secundario" th:href="@{${filtro.urlMapa}}">Ver mapa</a>
+            <a sec:authorize="hasRole('ADMIN')" class="boton" th:href="@{/sismos/nuevo}">+ Registrar sismo</a>
+        </div>
     </div>
 
     <th:block th:replace="~{fragments/layout :: mensajes}"></th:block>

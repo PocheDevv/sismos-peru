@@ -42,6 +42,17 @@
                             th:selected="${e == filtro.estado}"></option>
                 </select>
             </label>
+            <label>
+                <span>Registros por página</span>
+                <select name="tamanio" onchange="this.form.submit()">
+                    <option th:each="tamano : ${tamaniosPagina}"
+                            th:value="${tamano}" th:text="${tamano}"
+                            th:selected="${tamano == filtro.tamanioValido}"></option>
+                </select>
+            </label>
+            <input type="hidden" name="orden" th:value="${filtro.ordenValido}">
+            <input type="hidden" name="dir" th:value="${filtro.descendente} ? 'desc' : 'asc'">
+            <input type="hidden" name="pagina" value="1">
             <div class="acciones">
                 <button class="boton" type="submit">Filtrar</button>
                 <a class="boton-secundario" th:href="@{/reportes}">Limpiar</a>
@@ -54,13 +65,20 @@
             <span th:if="${pagina.totalElements > 0}"
                   th:text="'Mostrando ' + ${pagina.number * pagina.size + 1} + '–' + ${pagina.number * pagina.size + pagina.numberOfElements} + ' de ' + ${pagina.totalElements} + ' reporte(s)'"></span>
             <span th:if="${pagina.totalElements == 0}">0 reportes</span>
+            <span class="nota">Ordene por encabezado; la flecha indica el orden activo.</span>
         </div>
         <div class="tabla-scroll">
             <table>
                 <thead>
                 <tr>
-                    <th>Sismo</th><th>Ubicación</th><th>Fecha del reporte</th><th>Tipo de daño</th>
-                    <th>Cantidad</th><th>Nivel</th><th>Estado</th><th>Descripción</th><th>Acciones</th>
+                    <th><a th:href="@{${filtro.urlOrden('sismo')}}" th:text="'Sismo' + ${filtro.indicadorOrden('sismo')}"></a></th>
+                    <th><a th:href="@{${filtro.urlOrden('ubicacion')}}" th:text="'Ubicación' + ${filtro.indicadorOrden('ubicacion')}"></a></th>
+                    <th><a th:href="@{${filtro.urlOrden('fecha')}}" th:text="'Fecha del reporte' + ${filtro.indicadorOrden('fecha')}"></a></th>
+                    <th><a th:href="@{${filtro.urlOrden('tipo')}}" th:text="'Tipo de daño' + ${filtro.indicadorOrden('tipo')}"></a></th>
+                    <th><a th:href="@{${filtro.urlOrden('cantidad')}}" th:text="'Cantidad' + ${filtro.indicadorOrden('cantidad')}"></a></th>
+                    <th><a th:href="@{${filtro.urlOrden('nivel')}}" th:text="'Nivel' + ${filtro.indicadorOrden('nivel')}"></a></th>
+                    <th><a th:href="@{${filtro.urlOrden('estado')}}" th:text="'Estado' + ${filtro.indicadorOrden('estado')}"></a></th>
+                    <th>Descripción</th><th>Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
