@@ -157,3 +157,13 @@ th a:hover { color: #111827; }
 .barra-superior .menu { gap: 18px; font-size: 14px; }
 .sesion { margin-left: auto; }
 @media (max-width: 1440px) { .barra-superior .marca span { display: none; } }
+
+/* PA4 · Dashboard */
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 8px 0 20px; }
+.kpi { display: flex; flex-direction: column; gap: 4px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 18px 20px; text-decoration: none; color: inherit; }
+.kpi:hover { border-color: #2563eb; }
+.kpi-titulo { font-size: 13px; color: #6b7280; }
+.kpi-valor { font-size: 28px; color: #1f2937; }
+.kpi-ayuda { font-size: 12px; color: #9ca3af; }
+@media (max-width: 900px) { .kpis { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .kpis { grid-template-columns: 1fr; } }

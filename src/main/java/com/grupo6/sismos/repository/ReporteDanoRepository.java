@@ -1,6 +1,7 @@
 package com.grupo6.sismos.repository;
 
 import com.grupo6.sismos.entity.ReporteDano;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,23 @@ public interface ReporteDanoRepository extends JpaRepository<ReporteDano, Long> 
 
     @Query("SELECT SUM(r.cantidadAfectada) FROM ReporteDano r WHERE r.sismo.id = :sismoId")
     Long sumarCantidadAfectadaPorSismo(@Param("sismoId") Long sismoId);
+
+    @Query("""
+            SELECT COALESCE(SUM(r.cantidadAfectada), 0) FROM ReporteDano r
+            WHERE r.sismo.fechaHora >= :desde AND r.sismo.fechaHora < :hasta
+              AND (:departamento IS NULL OR r.sismo.ubigeo.codigo LIKE CONCAT(:departamento, '%'))
+            """)
+    long sumarAfectadosEnPeriodo(@Param("desde") LocalDateTime desde, @Param("hasta") LocalDateTime hasta,
+                                 @Param("departamento") String departamento);
+
+    @Query("""
+            SELECT COUNT(r) FROM ReporteDano r
+            WHERE r.estado = :estado
+              AND r.sismo.fechaHora >= :desde AND r.sismo.fechaHora < :hasta
+              AND (:departamento IS NULL OR r.sismo.ubigeo.codigo LIKE CONCAT(:departamento, '%'))
+            """)
+    long contarPorEstadoEnPeriodo(@Param("estado") String estado, @Param("desde") LocalDateTime desde,
+                                  @Param("hasta") LocalDateTime hasta, @Param("departamento") String departamento);
 
     long countBySismoId(Long sismoId);
 
