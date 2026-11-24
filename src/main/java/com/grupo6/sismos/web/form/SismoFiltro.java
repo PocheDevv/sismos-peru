@@ -15,6 +15,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class SismoFiltro {
 
     public static final int TAMANIO_PAGINA = 10;
+    /** HU-42: cantidades de filas por página que puede elegir el usuario. */
+    public static final List<Integer> TAMANIOS_PAGINA = List.of(10, 25, 50);
     public static final List<String> ORDENES = List.of(
             "codigo", "fecha", "magnitud", "profundidad", "ubicacion", "alerta", "estado");
 
@@ -31,6 +33,7 @@ public class SismoFiltro {
     private String orden;
     private String dir;
     private Integer pagina;
+    private Integer tamanio;
 
     /** Mensajes de filtros que no se aplicaron (rango invertido, valor inválido). */
     private final List<String> avisos = new ArrayList<>();
@@ -53,6 +56,15 @@ public class SismoFiltro {
 
     public int getPaginaValida() {
         return pagina == null || pagina < 1 ? 1 : pagina;
+    }
+
+    /** HU-42: si el tamaño no es uno de los permitidos, se usan 10 filas. */
+    public int getTamanioValido() {
+        return tamanio != null && TAMANIOS_PAGINA.contains(tamanio) ? tamanio : TAMANIO_PAGINA;
+    }
+
+    public boolean isTamanioInvalido() {
+        return tamanio != null && !TAMANIOS_PAGINA.contains(tamanio);
     }
 
     public boolean isTieneFiltros() {
@@ -93,6 +105,7 @@ public class SismoFiltro {
         Map<String, Object> p = parametrosFiltro();
         p.put("orden", getOrdenValido());
         p.put("dir", isDescendente() ? "desc" : "asc");
+        p.put("tamanio", getTamanioValido());
         p.put("pagina", numero);
         return url(p);
     }
@@ -113,6 +126,7 @@ public class SismoFiltro {
         Map<String, Object> p = parametrosFiltro();
         p.put("orden", columna);
         p.put("dir", descendente ? "desc" : "asc");
+        p.put("tamanio", getTamanioValido());
         return url(p);
     }
 
@@ -214,5 +228,13 @@ public class SismoFiltro {
 
     public void setPagina(Integer pagina) {
         this.pagina = pagina;
+    }
+
+    public Integer getTamanio() {
+        return tamanio;
+    }
+
+    public void setTamanio(Integer tamanio) {
+        this.tamanio = tamanio;
     }
 }

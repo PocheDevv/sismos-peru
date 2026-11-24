@@ -66,6 +66,15 @@
                 <span>Hasta</span>
                 <input name="hasta" type="date" th:value="${filtro.hasta}">
             </label>
+            <label>
+                <span>Registros por página</span>
+                <select name="tamanio" onchange="this.form.submit()">
+                    <option th:each="t : ${tamaniosPagina}"
+                            th:value="${t}" th:text="${t}" th:selected="${t == filtro.tamanioValido}"></option>
+                </select>
+            </label>
+            <input type="hidden" name="orden" th:value="${filtro.ordenValido}">
+            <input type="hidden" name="dir" th:value="${filtro.descendente} ? 'desc' : 'asc'">
             <div class="acciones">
                 <button class="boton" type="submit">Buscar</button>
                 <a class="boton-secundario" th:href="@{/sismos}">Limpiar filtros</a>

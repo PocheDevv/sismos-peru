@@ -61,14 +61,19 @@ public class SismoService {
     @Transactional(readOnly = true)
     public Page<Sismo> buscar(SismoFiltro filtro) {
         String codigoDepartamento = prepararFiltros(filtro);
+        if (filtro.isTamanioInvalido()) {
+            filtro.getAvisos().add("El tamaño de página no es válido; se usaron 10 registros.");
+            filtro.setTamanio(null);
+        }
+        int tamanio = filtro.getTamanioValido();
         Sort.Direction direccion = filtro.isDescendente() ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort orden = Sort.by(direccion, PROPIEDADES_ORDEN.get(filtro.getOrdenValido())).and(Sort.by(direccion, "id"));
-        PageRequest pagina = PageRequest.of(filtro.getPaginaValida() - 1, SismoFiltro.TAMANIO_PAGINA, orden);
+        PageRequest pagina = PageRequest.of(filtro.getPaginaValida() - 1, tamanio, orden);
 
         Page<Sismo> resultado = sismoRepository.findAll(SismoEspecificaciones.segun(filtro, codigoDepartamento), pagina);
         if (resultado.getTotalPages() > 0 && filtro.getPaginaValida() > resultado.getTotalPages()) {
             filtro.setPagina(resultado.getTotalPages());
-            pagina = PageRequest.of(resultado.getTotalPages() - 1, SismoFiltro.TAMANIO_PAGINA, orden);
+            pagina = PageRequest.of(resultado.getTotalPages() - 1, tamanio, orden);
             resultado = sismoRepository.findAll(SismoEspecificaciones.segun(filtro, codigoDepartamento), pagina);
         }
         return resultado;

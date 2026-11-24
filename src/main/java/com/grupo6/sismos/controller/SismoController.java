@@ -53,6 +53,7 @@ public class SismoController {
         model.addAttribute("departamentos", ubigeoService.departamentos());
         model.addAttribute("alertas", tipoAlertaService.listar());
         model.addAttribute("estados", Sismo.ESTADOS);
+        model.addAttribute("tamaniosPagina", SismoFiltro.TAMANIOS_PAGINA);
         return "sismos/lista";
     }
 
