@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head('Ubigeos')}"></head>
 <body>
 <div th:replace="~{fragments/layout :: barra('ubigeos')}"></div>
@@ -16,7 +16,7 @@
             <p class="subtitulo" th:if="${padre == null}">Catálogo de ubigeos INEI. Los departamentos se cargan desde ubigeo.csv (Importar CSV).</p>
             <p class="subtitulo" th:if="${padre != null}" th:text="${padre.tipo.nombre} + ' · ubigeo ' + ${padre.codigo} + ' · ' + ${padre.estado}"></p>
         </div>
-        <a class="boton" th:if="${tipoHijo != null}" th:href="@{/ubigeos/nuevo(padreId=${padre?.id})}"
+        <a sec:authorize="hasRole('ADMIN')" class="boton" th:if="${tipoHijo != null}" th:href="@{/ubigeos/nuevo(padreId=${padre?.id})}"
            th:text="${padre == null} ? '+ Nuevo departamento' : '+ Nueva ' + ${#strings.toLowerCase(tipoHijo.nombre)}"></a>
     </div>
 
@@ -43,8 +43,8 @@
                     <td class="acciones-tabla">
                         <a th:if="${u.tipo.tipoHijo != null}" th:href="@{/ubigeos(padreId=${u.id})}"
                            th:text="'Ver ' + ${#strings.toLowerCase(u.tipo.tipoHijo.nombre)} + 's'"></a>
-                        <a th:href="@{/ubigeos/{id}/editar(id=${u.id})}">Editar</a>
-                        <a class="enlace-peligro" th:href="@{/ubigeos/{id}/eliminar(id=${u.id})}">Eliminar</a>
+                        <a sec:authorize="hasRole('ADMIN')" th:href="@{/ubigeos/{id}/editar(id=${u.id})}">Editar</a>
+                        <a sec:authorize="hasRole('ADMIN')" class="enlace-peligro" th:href="@{/ubigeos/{id}/eliminar(id=${u.id})}">Eliminar</a>
                     </td>
                 </tr>
                 </tbody>

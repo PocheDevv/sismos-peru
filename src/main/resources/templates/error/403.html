@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Acceso denegado')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('')}"></div>
+<main class="contenedor">
+    <section class="tarjeta confirmacion">
+        <h1>Acceso denegado</h1>
+        <p class="subtitulo">Su usuario no tiene permiso para realizar esta acción.</p>
+        <p>Solo el administrador puede registrar, editar, eliminar, cambiar estados o importar datos.
+            Con el perfil de consulta puede revisar sismos, reportes, catálogos y el dashboard.</p>
+        <div class="acciones">
+            <a class="boton" th:href="@{/sismos}">Ir a sismos</a>
+            <a class="boton-secundario" href="javascript:history.back()">Volver</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

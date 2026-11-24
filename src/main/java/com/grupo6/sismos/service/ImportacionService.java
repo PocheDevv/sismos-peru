@@ -22,18 +22,22 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 /**
- * Importación de datos maestros desde CSV (ubigeo, tipo_alerta, tipo_dano).
+ * Importación de datos maestros desde CSV: ubigeo oficial del INEI (HU-41), ubigeo, tipo_alerta y tipo_dano.
  * Cada fila pasa por las mismas validaciones que el formulario: primero Bean Validation
  * sobre el Form y luego las reglas del servicio del catálogo. Las filas válidas se guardan
  * (cada una en su propia transacción) y las inválidas se informan con su motivo (HU-39, HU-40).
  */
 @Service
 public class ImportacionService {
+
+    private static final Pattern CODIGO_DISTRITO = Pattern.compile("\\d{6}");
+    private static final Set<String> PALABRAS_MENORES = Set.of("de", "del", "la", "las", "los", "el", "y", "e");
 
     private final Validator validator;
     private final UbigeoService ubigeoService;
@@ -77,9 +81,15 @@ public class ImportacionService {
 
         ResultadoImportacion resultado = new ResultadoImportacion(catalogo, nombreArchivo);
         Set<String> codigosDelArchivo = new HashSet<>();
+        Map<String, Ubigeo> cacheUbigeos = new HashMap<>();
         for (LectorCsv.Linea linea : datos) {
+            String codigo = valor(linea, indices, catalogo.getColumnaCodigo());
+            if (catalogo == CatalogoCsv.UBIGEO_OFICIAL && codigo.isEmpty() && valor(linea, indices, "nombdep").isEmpty()) {
+                // Notas al pie del archivo del INEI ("1/ SU CAPITAL LEGAL ES ..."): no son datos.
+                resultado.sumarOmitida();
+                continue;
+            }
             resultado.sumarLeida();
-            String codigo = valor(linea, indices, "codigo");
             if (linea.columnas().size() != lineas.get(0).columnas().size()) {
                 resultado.rechazar(linea.numero(), codigo, "La fila tiene " + linea.columnas().size()
                         + " columnas y el encabezado " + lineas.get(0).columnas().size() + ".");
@@ -90,10 +100,19 @@ public class ImportacionService {
                 continue;
             }
             try {
+                if (catalogo == CatalogoCsv.UBIGEO_OFICIAL) {
+                    if (importarUbigeoOficial(linea, indices, resultado, cacheUbigeos)) {
+                        resultado.sumarImportada();
+                    } else {
+                        resultado.sumarYaRegistrada();
+                    }
+                    continue;
+                }
                 switch (catalogo) {
                     case UBIGEO -> importarUbigeo(linea, indices);
                     case TIPO_ALERTA -> importarTipoAlerta(linea, indices);
                     case TIPO_DANO -> importarTipoDano(linea, indices);
+                    default -> throw new IllegalStateException("Catálogo no soportado: " + catalogo);
                 }
                 resultado.sumarImportada();
             } catch (ReglaNegocioException error) {
@@ -138,6 +157,79 @@ public class ImportacionService {
             form.setPadreId(padre.getId());
         }
         ubigeoService.registrar(form);
+    }
+
+    /**
+     * HU-41: cada fila del archivo oficial es un distrito. Su departamento (2 dígitos) y su provincia
+     * (4 dígitos) se crean la primera vez que aparecen; si ya existen, se reutilizan. Cada registro nuevo
+     * pasa por Bean Validation y por las reglas de UbigeoService, igual que en el formulario.
+     *
+     * @return true si el distrito se creó; false si ya estaba registrado
+     */
+    private boolean importarUbigeoOficial(LectorCsv.Linea linea, Map<String, Integer> indices,
+                                          ResultadoImportacion resultado, Map<String, Ubigeo> cache) {
+        String codigo = valor(linea, indices, "iddist");
+        String departamento = valor(linea, indices, "nombdep");
+        String provincia = valor(linea, indices, "nombprov");
+        String distrito = valor(linea, indices, "nombdist");
+        if (!CODIGO_DISTRITO.matcher(codigo).matches()) {
+            throw new ReglaNegocioException("iddist", "El código de distrito debe tener 6 dígitos.");
+        }
+        if (departamento.isEmpty() || provincia.isEmpty() || distrito.isEmpty()) {
+            throw new ReglaNegocioException(null, "Faltan el departamento, la provincia o el distrito.");
+        }
+        TipoUbigeo tipoRaiz = "CALLAO".equalsIgnoreCase(departamento)
+                ? TipoUbigeo.PROVINCIA_CONSTITUCIONAL : TipoUbigeo.DEPARTAMENTO;
+        Ubigeo dep = obtenerOCrear(codigo.substring(0, 2), departamento, tipoRaiz, null, resultado, cache);
+        Ubigeo prov = obtenerOCrear(codigo.substring(0, 4), provincia, TipoUbigeo.PROVINCIA, dep, resultado, cache);
+        if (ubigeoRepository.existsByCodigo(codigo)) {
+            return false;
+        }
+        crear(codigo, distrito, TipoUbigeo.DISTRITO, prov, resultado);
+        return true;
+    }
+
+    private Ubigeo obtenerOCrear(String codigo, String nombre, TipoUbigeo tipo, Ubigeo padre,
+                                 ResultadoImportacion resultado, Map<String, Ubigeo> cache) {
+        Ubigeo existente = cache.get(codigo);
+        if (existente == null) {
+            existente = ubigeoRepository.findByCodigo(codigo)
+                    .orElseGet(() -> crear(codigo, nombre, tipo, padre, resultado));
+            cache.put(codigo, existente);
+        }
+        return existente;
+    }
+
+    private Ubigeo crear(String codigo, String nombre, TipoUbigeo tipo, Ubigeo padre, ResultadoImportacion resultado) {
+        UbigeoForm form = new UbigeoForm();
+        form.setCodigo(codigo);
+        form.setNombre(nombrePropio(nombre));
+        form.setTipo(tipo.name());
+        form.setEstado("ACTIVO");
+        form.setPadreId(padre == null ? null : padre.getId());
+        validarForm(form);
+        Ubigeo creado = ubigeoService.registrar(form);
+        resultado.sumarCreado(tipo.isRaiz() ? "Departamentos" : tipo == TipoUbigeo.PROVINCIA ? "Provincias" : "Distritos");
+        return creado;
+    }
+
+    /** "SAN JUAN DE LURIGANCHO" → "San Juan de Lurigancho"; el INEI escribe todo en mayúsculas. */
+    static String nombrePropio(String texto) {
+        Locale es = Locale.forLanguageTag("es-PE");
+        String[] palabras = texto.replace('_', ' ').trim().toLowerCase(es).split("\\s+");
+        StringBuilder nombre = new StringBuilder();
+        for (int i = 0; i < palabras.length; i++) {
+            String p = palabras[i];
+            if (i > 0) {
+                nombre.append(' ');
+            }
+            if (i > 0 && PALABRAS_MENORES.contains(p)) {
+                nombre.append(p);
+            } else {
+                nombre.append(p.substring(0, 1).toUpperCase(es)).append(p.substring(1));
+            }
+        }
+        return nombre.toString();
     }
 
     private void importarTipoAlerta(LectorCsv.Linea linea, Map<String, Integer> indices) {

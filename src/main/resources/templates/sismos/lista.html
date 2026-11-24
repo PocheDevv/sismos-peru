@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head('Sismos')}"></head>
 <body>
 <div th:replace="~{fragments/layout :: barra('sismos')}"></div>
@@ -9,7 +9,7 @@
             <h1>Sismos registrados</h1>
             <p class="subtitulo">Eventos sísmicos reportados en el territorio peruano.</p>
         </div>
-        <a class="boton" th:href="@{/sismos/nuevo}">+ Registrar sismo</a>
+        <a sec:authorize="hasRole('ADMIN')" class="boton" th:href="@{/sismos/nuevo}">+ Registrar sismo</a>
     </div>
 
     <th:block th:replace="~{fragments/layout :: mensajes}"></th:block>
@@ -111,8 +111,8 @@
                     <td><span th:class="${s.claseEstado}" th:text="${s.estado}"></span></td>
                     <td class="acciones-tabla">
                         <a th:href="@{/sismos/{id}(id=${s.id})}">Ver</a>
-                        <a th:href="@{/sismos/{id}/editar(id=${s.id})}">Editar</a>
-                        <a class="enlace-peligro" th:href="@{/sismos/{id}/eliminar(id=${s.id})}">Eliminar</a>
+                        <a sec:authorize="hasRole('ADMIN')" th:href="@{/sismos/{id}/editar(id=${s.id})}">Editar</a>
+                        <a sec:authorize="hasRole('ADMIN')" class="enlace-peligro" th:href="@{/sismos/{id}/eliminar(id=${s.id})}">Eliminar</a>
                     </td>
                 </tr>
                 </tbody>

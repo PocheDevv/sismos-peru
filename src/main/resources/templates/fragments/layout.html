@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <!-- Fragmentos comunes a todas las vistas -->
 <head th:fragment="head(titulo)">
     <meta charset="UTF-8">
@@ -18,8 +18,20 @@
         <a th:href="@{/estaciones}" th:classappend="${seccion == 'estaciones'} ? 'activo'">Estaciones</a>
         <a th:href="@{/tipos-alerta}" th:classappend="${seccion == 'alertas'} ? 'activo'">Tipos de alerta</a>
         <a th:href="@{/tipos-dano}" th:classappend="${seccion == 'danos'} ? 'activo'">Tipos de daño</a>
-        <a th:href="@{/importacion}" th:classappend="${seccion == 'importacion'} ? 'activo'">Importar CSV</a>
+        <a th:href="@{/importacion}" th:classappend="${seccion == 'importacion'} ? 'activo'"
+           sec:authorize="hasRole('ADMIN')">Importar CSV</a>
     </nav>
+    <!-- HU-19 y HU-38: usuario en sesión, su perfil y cerrar sesión (POST con token CSRF) -->
+    <div class="sesion" sec:authorize="isAuthenticated()">
+        <span class="sesion-usuario">
+            <strong sec:authentication="name">usuario</strong>
+            <span sec:authorize="hasRole('ADMIN')">Administrador</span>
+            <span sec:authorize="!hasRole('ADMIN')">Consulta</span>
+        </span>
+        <form method="post" th:action="@{/logout}">
+            <button type="submit" class="boton-salir">Cerrar sesión</button>
+        </form>
+    </div>
 </div>
 
 <!-- Mensajes de éxito o error que llegan después de redirigir (flash) -->

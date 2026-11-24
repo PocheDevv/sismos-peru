@@ -1,54 +1,55 @@
 -- =====================================================================
 -- SismosPerú (PA3) - Datos de demostración
--- Ejecutar DESPUÉS de importar ubigeo.csv y tipo_alerta.csv desde la
--- aplicación (pantalla Importar CSV), porque usa esos códigos.
+-- Ejecutar DESPUÉS de importar en la aplicación (pantalla Importar CSV) el
+-- ubigeo oficial, tipo_alerta.csv y tipo_dano.csv, porque usa esos códigos.
+-- Si el ubigeo oficial ya trae una provincia o distrito, se conserva (INSERT IGNORE).
 -- =====================================================================
 SET NAMES utf8mb4;
 USE sismos_peru;
 
 -- Provincias (el padre se busca por el código del departamento)
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '0218', 'Santa', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '02';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '0401', 'Arequipa', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '04';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '0405', 'Caylloma', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '04';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '0701', 'Callao', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '07';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '0801', 'Cusco', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '08';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '0809', 'La Convención', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '08';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '1101', 'Ica', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '11';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '1103', 'Nasca', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '11';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '1301', 'Trujillo', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '13';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '1501', 'Lima', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '15';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '1505', 'Cañete', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '15';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '1601', 'Maynas', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '16';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '1801', 'Mariscal Nieto', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '18';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '1803', 'Ilo', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '18';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '2001', 'Piura', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '20';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '2101', 'Puno', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '21';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '2301', 'Tacna', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '23';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '2302', 'Candarave', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '23';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '0218', 'Santa', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '02';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '0401', 'Arequipa', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '04';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '0405', 'Caylloma', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '04';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '0701', 'Callao', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '07';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '0801', 'Cusco', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '08';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '0809', 'La Convención', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '08';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '1101', 'Ica', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '11';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '1103', 'Nasca', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '11';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '1301', 'Trujillo', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '13';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '1501', 'Lima', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '15';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '1505', 'Cañete', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '15';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '1601', 'Maynas', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '16';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '1801', 'Mariscal Nieto', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '18';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '1803', 'Ilo', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '18';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '2001', 'Piura', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '20';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '2101', 'Puno', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '21';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '2301', 'Tacna', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '23';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '2302', 'Candarave', 'PROVINCIA', 'ACTIVO', id FROM ubigeo WHERE codigo = '23';
 
 -- Distritos
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '021801', 'Chimbote', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '0218';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '040101', 'Arequipa', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '0401';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '040501', 'Chivay', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '0405';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '040503', 'Cabanaconde', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '0405';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '070101', 'Callao', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '0701';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '080101', 'Cusco', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '0801';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '080902', 'Echarati', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '0809';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '110101', 'Ica', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1101';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '110301', 'Nasca', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1103';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '110304', 'Marcona', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1103';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '110305', 'Vista Alegre', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1103';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '130101', 'Trujillo', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1301';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '150101', 'Lima', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1501';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '150501', 'San Vicente de Cañete', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1505';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '160101', 'Iquitos', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1601';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '180101', 'Moquegua', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1801';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '180301', 'Ilo', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1803';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '200101', 'Piura', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '2001';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '210101', 'Puno', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '2101';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '230101', 'Tacna', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '2301';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '230108', 'Pocollay', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '2301';
-INSERT INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '230201', 'Candarave', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '2302';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '021801', 'Chimbote', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '0218';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '040101', 'Arequipa', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '0401';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '040501', 'Chivay', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '0405';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '040503', 'Cabanaconde', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '0405';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '070101', 'Callao', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '0701';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '080101', 'Cusco', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '0801';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '080902', 'Echarati', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '0809';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '110101', 'Ica', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1101';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '110301', 'Nasca', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1103';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '110304', 'Marcona', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1103';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '110305', 'Vista Alegre', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1103';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '130101', 'Trujillo', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1301';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '150101', 'Lima', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1501';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '150501', 'San Vicente de Cañete', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1505';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '160101', 'Iquitos', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1601';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '180101', 'Moquegua', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1801';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '180301', 'Ilo', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '1803';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '200101', 'Piura', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '2001';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '210101', 'Puno', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '2101';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '230101', 'Tacna', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '2301';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '230108', 'Pocollay', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '2301';
+INSERT IGNORE INTO ubigeo (codigo, nombre, tipo, estado, padre_id) SELECT '230201', 'Candarave', 'DISTRITO', 'ACTIVO', id FROM ubigeo WHERE codigo = '2302';
 
 -- Estaciones de monitoreo (TAC-02 está inactiva)
 INSERT INTO estacion_monitoreo (codigo, nombre, ubigeo_id, latitud, longitud, fecha_instalacion, estado) SELECT 'ARE-01', 'Estación Chivay', id, -15.6380, -71.6010, '2019-03-12', 'ACTIVO' FROM ubigeo WHERE codigo = '040501';

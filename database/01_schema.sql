@@ -8,6 +8,7 @@ SET NAMES utf8mb4;
 CREATE DATABASE IF NOT EXISTS sismos_peru CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE sismos_peru;
 
+DROP TABLE IF EXISTS usuario;
 DROP TABLE IF EXISTS seguimiento_sismo;
 DROP TABLE IF EXISTS reporte_dano;
 DROP TABLE IF EXISTS sismo;
@@ -150,3 +151,24 @@ CREATE TABLE seguimiento_sismo (
     acciones_realizadas VARCHAR(500) NOT NULL,
     CONSTRAINT fk_seguimiento_sismo FOREIGN KEY (sismo_id) REFERENCES sismo (id) ON DELETE CASCADE
 );
+
+-- ---------------------------------------------------------------------
+-- Usuarios (HU-19): la contraseña se guarda solo como hash BCrypt.
+-- ADMIN registra, edita y elimina; CONSULTA solo puede ver.
+-- Credenciales de prueba en el README.
+-- ---------------------------------------------------------------------
+CREATE TABLE usuario (
+    id            BIGINT       PRIMARY KEY AUTO_INCREMENT,
+    username      VARCHAR(40)  NOT NULL,
+    nombre        VARCHAR(100) NOT NULL,
+    password_hash VARCHAR(100) NOT NULL,
+    rol           VARCHAR(20)  NOT NULL,
+    estado        VARCHAR(10)  NOT NULL DEFAULT 'ACTIVO',
+    CONSTRAINT uq_usuario_username UNIQUE (username),
+    CONSTRAINT chk_usuario_rol CHECK (rol IN ('ADMIN', 'CONSULTA')),
+    CONSTRAINT chk_usuario_estado CHECK (estado IN ('ACTIVO', 'INACTIVO'))
+);
+
+INSERT INTO usuario (username, nombre, password_hash, rol, estado) VALUES
+('admin',    'Administrador del sistema', '$2a$10$w1CcxLk1lkPc06dtmY7Ttu01WLtTo/UnF/QFNDeGmoLVT21ib5DTq', 'ADMIN',    'ACTIVO'),
+('consulta', 'Usuario de consulta',       '$2a$10$UwaH4A17yY/Ylyu0d6dWvuoOstCthihQAo1cAkYBdCgkz6MG946cK', 'CONSULTA', 'ACTIVO');

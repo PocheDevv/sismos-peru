@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head('Estaciones')}"></head>
 <body>
 <div th:replace="~{fragments/layout :: barra('estaciones')}"></div>
@@ -9,7 +9,7 @@
             <h1>Estaciones de monitoreo</h1>
             <p class="subtitulo">Estaciones que captan los eventos sísmicos. Las inactivas no reciben sismos nuevos.</p>
         </div>
-        <a class="boton" th:href="@{/estaciones/nuevo}">+ Nueva estación</a>
+        <a sec:authorize="hasRole('ADMIN')" class="boton" th:href="@{/estaciones/nuevo}">+ Nueva estación</a>
     </div>
 
     <th:block th:replace="~{fragments/layout :: mensajes}"></th:block>
@@ -30,7 +30,7 @@
                     <td th:text="${#temporals.format(e.fechaInstalacion, 'dd/MM/yyyy')}"></td>
                     <td th:text="${sismosPorEstacion.get(e.id)} ?: 0"></td>
                     <td><span class="badge" th:classappend="${e.activa} ? 'badge-activo' : 'badge-inactivo'" th:text="${e.estado}"></span></td>
-                    <td class="acciones-tabla"><a th:href="@{/estaciones/{id}/editar(id=${e.id})}">Editar</a></td>
+                    <td class="acciones-tabla"><a sec:authorize="hasRole('ADMIN')" th:href="@{/estaciones/{id}/editar(id=${e.id})}">Editar</a></td>
                 </tr>
                 </tbody>
             </table>

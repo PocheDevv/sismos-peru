@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Iniciar sesión')}"></head>
+<body class="pagina-login">
+<main class="login-contenedor">
+    <section class="tarjeta login-tarjeta">
+        <p class="login-marca">SismosPerú</p>
+        <h1>Iniciar sesión</h1>
+        <p class="subtitulo">Sistema de Gestión de Sismos del Perú</p>
+
+        <div class="alerta alerta-error" th:if="${param.error}">Usuario o contraseña incorrectos.</div>
+        <div class="alerta alerta-exito" th:if="${param.salir}">Cerró sesión correctamente.</div>
+
+        <form method="post" th:action="@{/login}" class="login-formulario">
+            <label>
+                <span>Usuario</span>
+                <input type="text" name="username" autocomplete="username" required autofocus>
+            </label>
+            <label>
+                <span>Contraseña</span>
+                <input type="password" name="password" autocomplete="current-password" required>
+            </label>
+            <button class="boton" type="submit">Ingresar</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

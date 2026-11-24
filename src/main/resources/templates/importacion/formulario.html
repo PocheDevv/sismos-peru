@@ -5,7 +5,8 @@
 <div th:replace="~{fragments/layout :: barra('importacion')}"></div>
 <main class="contenedor">
     <h1>Importar datos maestros</h1>
-    <p class="subtitulo">Carga los catálogos iniciales desde los archivos CSV del curso. Importe primero el ubigeo.</p>
+    <p class="subtitulo">Carga los catálogos iniciales desde CSV. Importe primero el ubigeo oficial del INEI
+        (UBIGEOS_2022_1891_distritos.csv, en la carpeta datos/) y luego los tipos de alerta y de daño.</p>
 
     <div class="alerta alerta-error" th:if="${error}" th:text="${error}"></div>
 
@@ -37,8 +38,24 @@
         <div class="cifras">
             <div><strong th:text="${resultado.filasLeidas}"></strong>filas leídas</div>
             <div><strong th:text="${resultado.importadas}"></strong>importadas</div>
+            <div th:if="${resultado.yaRegistradas > 0}"><strong th:text="${resultado.yaRegistradas}"></strong>ya registradas</div>
             <div><strong th:text="${resultado.rechazadas.size()}"></strong>rechazadas</div>
+            <div th:if="${resultado.omitidas > 0}"><strong th:text="${resultado.omitidas}"></strong>notas omitidas</div>
         </div>
+        <!-- HU-41: con el ubigeo oficial se informan los registros creados por nivel -->
+        <div class="tabla-scroll" th:if="${!resultado.creadosPorNivel.isEmpty()}">
+            <table class="tabla-resumen">
+                <thead><tr><th>Nivel</th><th>Registros nuevos</th></tr></thead>
+                <tbody>
+                <tr th:each="n : ${resultado.creadosPorNivel}">
+                    <td th:text="${n.key}"></td><td th:text="${n.value}"></td>
+                </tr>
+                <tr><td><strong>Total de ubigeos creados</strong></td><td><strong th:text="${resultado.totalCreados}"></strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="nota" th:if="${resultado.omitidas > 0}"
+           th:text="'Se omitieron ' + ${resultado.omitidas} + ' líneas de notas al pie del archivo (por ejemplo, «1/ SU CAPITAL LEGAL ES…»), porque no son distritos.'"></p>
         <div class="tabla-scroll" th:if="${!resultado.rechazadas.isEmpty()}">
             <table>
                 <thead><tr><th>Línea</th><th>Código</th><th>Motivo del rechazo</th></tr></thead>
@@ -51,7 +68,9 @@
                 </tbody>
             </table>
         </div>
-        <p class="alerta alerta-exito" th:if="${resultado.rechazadas.isEmpty()}">Todas las filas se importaron correctamente.</p>
+        <p class="alerta alerta-exito" th:if="${resultado.rechazadas.isEmpty() and resultado.yaRegistradas == 0}">Todas las filas se importaron correctamente.</p>
+        <p class="alerta alerta-exito" th:if="${resultado.rechazadas.isEmpty() and resultado.yaRegistradas > 0}"
+           th:text="${resultado.yaRegistradas} + ' filas ya estaban registradas con el mismo código; no se duplicó ningún registro.'"></p>
     </section>
 
     <section class="tarjeta">

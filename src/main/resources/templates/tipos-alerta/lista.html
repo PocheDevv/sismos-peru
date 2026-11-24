@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head('Tipos de alerta')}"></head>
 <body>
 <div th:replace="~{fragments/layout :: barra('alertas')}"></div>
@@ -9,7 +9,7 @@
             <h1>Tipos de alerta</h1>
             <p class="subtitulo">Clasificación de cada sismo. Solo las alertas activas se pueden elegir al registrar un sismo.</p>
         </div>
-        <a class="boton" th:href="@{/tipos-alerta/nuevo}">+ Nuevo tipo de alerta</a>
+        <a sec:authorize="hasRole('ADMIN')" class="boton" th:href="@{/tipos-alerta/nuevo}">+ Nuevo tipo de alerta</a>
     </div>
     <th:block th:replace="~{fragments/layout :: mensajes}"></th:block>
     <section class="tarjeta">
@@ -28,7 +28,7 @@
                     <td style="white-space: normal" th:text="${t.descripcion} ?: '—'"></td>
                     <td><span class="badge" th:classappend="${t.activo} ? 'badge-activo' : 'badge-inactivo'" th:text="${t.estado}"></span></td>
                     <td class="acciones-tabla">
-                        <form method="post" th:action="@{/tipos-alerta/{id}/estado(id=${t.id})}">
+                        <form sec:authorize="hasRole('ADMIN')" method="post" th:action="@{/tipos-alerta/{id}/estado(id=${t.id})}">
                             <button class="boton-enlace" type="submit" th:text="${t.activo} ? 'Desactivar' : 'Activar'"></button>
                         </form>
                     </td>

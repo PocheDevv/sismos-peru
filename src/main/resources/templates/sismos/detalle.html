@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <head th:replace="~{fragments/layout :: head('Sismo ' + ${sismo.codigo})}"></head>
     <body>
         <div th:replace="~{fragments/layout :: barra('sismos')}"></div>
@@ -14,14 +14,14 @@
                     <p class="subtitulo" th:text="${sismo.ubigeo.ubicacionCompleta}"></p>
                 </div>
                 <div class="acciones">
-                    <form method="post" th:action="@{/sismos/{id}/relevante(id=${sismo.id})}"
+                    <form sec:authorize="hasRole('ADMIN')" method="post" th:action="@{/sismos/{id}/relevante(id=${sismo.id})}"
                           th:if="${sismo.relevante or sismo.estado != 'Cerrado'}">
                         <input type="hidden" name="relevante" th:value="${!sismo.relevante}">
                         <button type="submit" class="boton-secundario"
                                 th:text="${sismo.relevante} ? 'Quitar de seguimiento' : 'Marcar como relevante'"></button>
                     </form>
-                    <a class="boton" th:href="@{/sismos/{id}/editar(id=${sismo.id})}">Editar</a>
-                    <a class="boton-peligro" th:href="@{/sismos/{id}/eliminar(id=${sismo.id})}">Eliminar</a>
+                    <a sec:authorize="hasRole('ADMIN')" class="boton" th:href="@{/sismos/{id}/editar(id=${sismo.id})}">Editar</a>
+                    <a sec:authorize="hasRole('ADMIN')" class="boton-peligro" th:href="@{/sismos/{id}/eliminar(id=${sismo.id})}">Eliminar</a>
                     <a class="boton-secundario" th:href="@{/sismos}">Volver a la lista</a>
                 </div>
             </div>
@@ -51,7 +51,7 @@
             <section class="tarjeta">
                 <div class="barra-resultados">
                     <h2 class="titulo-tarjeta" th:text="'Reportes de afectación (' + ${reportes.size()} + ')'"></h2>
-                    <a class="boton-secundario" th:href="@{/sismos/{id}/reportes/nuevo(id=${sismo.id})}">+ Reporte de afectación</a>
+                    <a sec:authorize="hasRole('ADMIN')" class="boton-secundario" th:href="@{/sismos/{id}/reportes/nuevo(id=${sismo.id})}">+ Reporte de afectación</a>
                 </div>
                 <p class="subtitulo">Total acumulado de afectados: <strong th:text="${#numbers.formatInteger(totalAfectados, 1, 'COMMA')}"></strong></p>
                 <div class="tabla-scroll">
@@ -73,7 +73,7 @@
                                 <td><span th:class="${r.claseNivel}" th:text="${r.nivel}"></span></td>
                                 <td>
                                     <span th:class="${r.claseEstado}" th:text="${r.estado}"></span>
-                                    <form th:unless="${r.cerrado}" class="form-estado" method="post"
+                                    <form sec:authorize="hasRole('ADMIN')" th:unless="${r.cerrado}" class="form-estado" method="post"
                                           th:action="@{/sismos/{s}/reportes/{id}/estado(s=${sismo.id}, id=${r.id})}">
                                         <input type="hidden" name="estado" th:value="${r.siguienteEstado}">
                                         <button type="submit" class="boton-enlace"
@@ -82,7 +82,7 @@
                                 </td>
                                 <td class="texto-largo" th:text="${r.descripcion}"></td>
                                 <td class="acciones-tabla">
-                                    <a th:unless="${r.cerrado}" th:href="@{/sismos/{s}/reportes/{id}/editar(s=${sismo.id}, id=${r.id})}">Editar</a>
+                                    <a sec:authorize="hasRole('ADMIN')" th:unless="${r.cerrado}" th:href="@{/sismos/{s}/reportes/{id}/editar(s=${sismo.id}, id=${r.id})}">Editar</a>
                                     <span th:if="${r.cerrado}" class="nota">Sin cambios</span>
                                 </td>
                             </tr>
@@ -95,7 +95,7 @@
             <section class="tarjeta" th:if="${sismo.relevante or !seguimientos.isEmpty()}">
                 <div class="barra-resultados">
                     <h2 class="titulo-tarjeta" th:text="'Seguimiento del sismo (' + ${seguimientos.size()} + ')'"></h2>
-                    <a class="boton-secundario" th:if="${sismo.relevante and sismo.estado != 'Cerrado'}"
+                    <a sec:authorize="hasRole('ADMIN')" class="boton-secundario" th:if="${sismo.relevante and sismo.estado != 'Cerrado'}"
                        th:href="@{/sismos/{id}/seguimientos/nuevo(id=${sismo.id})}">+ Registrar seguimiento</a>
                 </div>
                 <div class="tabla-scroll">

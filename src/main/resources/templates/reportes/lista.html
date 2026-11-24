@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head('Reportes de afectación')}"></head>
 <body>
 <div th:replace="~{fragments/layout :: barra('reportes')}"></div>
@@ -78,7 +78,7 @@
                     <td><span th:class="${r.claseEstado}" th:text="${r.estado}"></span></td>
                     <td class="texto-largo" th:text="${r.descripcion}"></td>
                     <td class="acciones-tabla">
-                        <a th:unless="${r.cerrado}" th:href="@{/sismos/{s}/reportes/{id}/editar(s=${r.sismo.id}, id=${r.id})}">Editar</a>
+                        <a sec:authorize="hasRole('ADMIN')" th:unless="${r.cerrado}" th:href="@{/sismos/{s}/reportes/{id}/editar(s=${r.sismo.id}, id=${r.id})}">Editar</a>
                         <span th:if="${r.cerrado}" class="nota">Sin cambios</span>
                     </td>
                 </tr>
