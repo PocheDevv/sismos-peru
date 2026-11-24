@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="visualizador(sismos, centroLatitud, centroLongitud, zoom)" class="mapa-componente"
+     th:attr="data-centro-latitud=${centroLatitud},data-centro-longitud=${centroLongitud},data-zoom=${zoom}">
+    <div class="mapa-canvas" role="application" aria-label="Mapa de ubicaciones sísmicas"></div>
+    <p class="mapa-aviso" role="status" aria-live="polite">Cargando mapa…</p>
+    <div class="mapa-datos" hidden>
+        <div th:each="s : ${sismos}" th:if="${s.tieneCoordenadasValidas}"
+             th:attr="data-latitud=${s.latitud},data-longitud=${s.longitud},data-magnitud=${s.magnitud},data-profundidad=${s.profundidad},
+                      data-fecha=${#temporals.format(s.fechaHora, 'dd/MM/yyyy HH:mm')},
+                      data-referencia=${s.referencia} ?: 'Sin referencia',
+                      data-url=@{/sismos/{id}(id=${s.id})}"></div>
+    </div>
+    <div class="mapa-leyenda" aria-label="Escala de magnitud">
+        <span><i class="mapa-muestra magnitud-baja"></i> M &lt; 4</span>
+        <span><i class="mapa-muestra magnitud-media"></i> M 4–5.9</span>
+        <span><i class="mapa-muestra magnitud-alta"></i> M ≥ 6</span>
+    </div>
+</div>
+</body>
+</html>

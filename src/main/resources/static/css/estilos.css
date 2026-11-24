@@ -171,3 +171,21 @@ th a:hover { color: #111827; }
 .graficos .tarjeta { margin-bottom: 20px; }
 .grafico-contenedor { position: relative; height: 300px; }
 @media (max-width: 900px) { .graficos { grid-template-columns: 1fr; } }
+
+/* HU-18, HU-32, HU-33 y HU-34: mapas reutilizables de sismos */
+.mapa-componente { width: 100%; }
+.mapa-canvas { width: 100%; height: 440px; border: 1px solid #d1d5db; border-radius: 6px; background: #e5e7eb; }
+.mapa-aviso { min-height: 18px; margin: 8px 0; color: #6b7280; font-size: 13px; }
+.mapa-leyenda { display: flex; flex-wrap: wrap; gap: 10px 20px; color: #4b5563; font-size: 12px; }
+.mapa-leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+.mapa-muestra { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.magnitud-baja { background: #15803d; color: #fff; }
+.magnitud-media { background: #b45309; color: #fff; }
+.magnitud-alta { background: #b91c1c; color: #fff; }
+.marcador-magnitud { background: transparent; border: 0; }
+.marcador-etiqueta { display: inline-flex; align-items: center; justify-content: center; min-width: 58px; height: 27px; padding: 0 7px; border: 2px solid #fff; border-radius: 999px; box-shadow: 0 1px 5px #1f293780; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.resumen-marcador { min-width: 180px; }
+.resumen-marcador p { margin: 6px 0; }
+.resumen-marcador a { display: inline-block; margin-top: 6px; color: #2563eb; }
+.alerta-info { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+@media (max-width: 720px) { .mapa-canvas { height: 340px; } }

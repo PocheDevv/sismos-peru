@@ -15,6 +15,7 @@ import com.grupo6.sismos.web.error.ReglaNegocioException;
 import com.grupo6.sismos.web.form.SismoFiltro;
 import com.grupo6.sismos.web.form.SismoForm;
 import java.util.Locale;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.springframework.data.domain.Page;
@@ -59,6 +60,28 @@ public class SismoService {
     /** HU-15: filtra, ordena y pagina. Los filtros con rangos invertidos no se aplican y quedan como aviso. */
     @Transactional(readOnly = true)
     public Page<Sismo> buscar(SismoFiltro filtro) {
+        String codigoDepartamento = prepararFiltros(filtro);
+        Sort.Direction direccion = filtro.isDescendente() ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort orden = Sort.by(direccion, PROPIEDADES_ORDEN.get(filtro.getOrdenValido())).and(Sort.by(direccion, "id"));
+        PageRequest pagina = PageRequest.of(filtro.getPaginaValida() - 1, SismoFiltro.TAMANIO_PAGINA, orden);
+
+        Page<Sismo> resultado = sismoRepository.findAll(SismoEspecificaciones.segun(filtro, codigoDepartamento), pagina);
+        if (resultado.getTotalPages() > 0 && filtro.getPaginaValida() > resultado.getTotalPages()) {
+            filtro.setPagina(resultado.getTotalPages());
+            pagina = PageRequest.of(resultado.getTotalPages() - 1, SismoFiltro.TAMANIO_PAGINA, orden);
+            resultado = sismoRepository.findAll(SismoEspecificaciones.segun(filtro, codigoDepartamento), pagina);
+        }
+        return resultado;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Sismo> buscarParaMapa(SismoFiltro filtro) {
+        String codigoDepartamento = prepararFiltros(filtro);
+        Sort orden = Sort.by(Sort.Direction.DESC, "fechaHora").and(Sort.by(Sort.Direction.DESC, "id"));
+        return sismoRepository.findAll(SismoEspecificaciones.segun(filtro, codigoDepartamento), orden);
+    }
+
+    private String prepararFiltros(SismoFiltro filtro) {
         if (filtro.getMagnitudMin() != null && filtro.getMagnitudMax() != null
                 && filtro.getMagnitudMin() > filtro.getMagnitudMax()) {
             filtro.getAvisos().add("La magnitud mínima no puede ser mayor que la máxima; no se aplicó ese filtro.");
@@ -74,23 +97,11 @@ public class SismoService {
             filtro.getAvisos().add("El estado elegido no es válido; no se aplicó ese filtro.");
             filtro.setEstado(null);
         }
-        String codigoDepartamento = null;
-        if (filtro.getDepartamentoId() != null) {
-            codigoDepartamento = ubigeoRepository.findById(filtro.getDepartamentoId())
-                    .map(Ubigeo::getCodigo).orElse(null);
+        if (filtro.getDepartamentoId() == null) {
+            return null;
         }
-
-        Sort.Direction direccion = filtro.isDescendente() ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Sort orden = Sort.by(direccion, PROPIEDADES_ORDEN.get(filtro.getOrdenValido())).and(Sort.by(direccion, "id"));
-        PageRequest pagina = PageRequest.of(filtro.getPaginaValida() - 1, SismoFiltro.TAMANIO_PAGINA, orden);
-
-        Page<Sismo> resultado = sismoRepository.findAll(SismoEspecificaciones.segun(filtro, codigoDepartamento), pagina);
-        if (resultado.getTotalPages() > 0 && filtro.getPaginaValida() > resultado.getTotalPages()) {
-            filtro.setPagina(resultado.getTotalPages());
-            pagina = PageRequest.of(resultado.getTotalPages() - 1, SismoFiltro.TAMANIO_PAGINA, orden);
-            resultado = sismoRepository.findAll(SismoEspecificaciones.segun(filtro, codigoDepartamento), pagina);
-        }
-        return resultado;
+        return ubigeoRepository.findById(filtro.getDepartamentoId())
+                .map(Ubigeo::getCodigo).orElse(null);
     }
 
     @Transactional(readOnly = true)

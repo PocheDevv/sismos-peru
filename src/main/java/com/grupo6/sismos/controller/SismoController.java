@@ -11,6 +11,7 @@ import com.grupo6.sismos.web.error.ReglaNegocioException;
 import com.grupo6.sismos.web.form.SismoFiltro;
 import com.grupo6.sismos.web.form.SismoForm;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -55,6 +56,16 @@ public class SismoController {
         return "sismos/lista";
     }
 
+    @GetMapping("/mapa")
+    public String mapa(@ModelAttribute("filtro") SismoFiltro filtro, BindingResult errores, Model model) {
+        if (errores.hasErrors()) {
+            filtro.getAvisos().add("Algunos filtros tenían un valor no válido y no se aplicaron.");
+        }
+        model.addAttribute("sismosMapa", sismoService.buscarParaMapa(filtro));
+        model.addAttribute("departamentos", ubigeoService.departamentos());
+        return "sismos/mapa";
+    }
+
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
         cargarFormulario(model, new SismoForm(), null);
@@ -79,7 +90,9 @@ public class SismoController {
 
     @GetMapping("/{id}")
     public String detalle(@PathVariable Long id, Model model) {
-        model.addAttribute("sismo", sismoService.buscarPorId(id));
+        Sismo sismo = sismoService.buscarPorId(id);
+        model.addAttribute("sismo", sismo);
+        model.addAttribute("sismosMapa", List.of(sismo));
         model.addAttribute("reportes", reporteDanoService.listarPorSismo(id));
         model.addAttribute("totalAfectados", reporteDanoService.totalAfectadosPorSismo(id));
         model.addAttribute("seguimientos", seguimientoService.listarPorSismo(id));

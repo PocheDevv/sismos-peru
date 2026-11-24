@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -24,6 +25,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReporteDanoService {
 
     public static final int TAMANIO_PAGINA = 10;
+    private static final Map<String, String> PROPIEDADES_ORDEN = Map.of(
+            "fecha", "fechaReporte",
+            "sismo", "sismo.codigo",
+            "ubicacion", "sismo.ubigeo.codigo",
+            "tipo", "tipoDano.nombre",
+            "cantidad", "cantidadAfectada",
+            "nivel", "nivel",
+            "estado", "estado");
 
     private final ReporteDanoRepository reporteDanoRepository;
     private final SismoRepository sismoRepository;
@@ -65,6 +74,7 @@ public class ReporteDanoService {
         Long tipoDanoId = validarTipoDano(filtro);
         validarNivel(filtro);
         validarEstado(filtro);
+        validarPaginacion(filtro);
 
         int numero = filtro.getPaginaValida();
         Page<ReporteDano> resultado = buscarReportes(tipoDanoId, filtro, numero);
@@ -131,13 +141,43 @@ public class ReporteDanoService {
         return valor == null || valor.isBlank() ? null : valor.trim().toUpperCase(Locale.ROOT);
     }
 
-    private Page<ReporteDano> buscarReportes(Long tipoDanoId, ReporteDanoFiltro filtro, int numero) {
-        return reporteDanoRepository.buscarPorFiltros(tipoDanoId, filtro.getNivel(), filtro.getEstado(),
-                paginaDeReportes(numero));
+    private void validarPaginacion(ReporteDanoFiltro filtro) {
+        String tamanio = filtro.getTamanio();
+        if (tamanio != null && !tamanio.isBlank()) {
+            try {
+                if (!ReporteDanoFiltro.TAMANIOS_PAGINA.contains(Integer.parseInt(tamanio))) {
+                    filtro.getAvisos().add("El tamaño de página no es válido; se usaron 10 registros.");
+                }
+            } catch (NumberFormatException error) {
+                filtro.getAvisos().add("El tamaño de página no es válido; se usaron 10 registros.");
+            }
+        }
+        filtro.setTamanio(Integer.toString(filtro.getTamanioValido()));
+
+        if (filtro.getOrden() != null && !filtro.getOrden().isBlank()
+                && !ReporteDanoFiltro.ORDENES.contains(filtro.getOrden())) {
+            filtro.getAvisos().add("El campo de ordenamiento no es válido; se usó la fecha del reporte.");
+        }
+        filtro.setOrden(filtro.getOrdenValido());
+
+        if (filtro.getDir() != null && !filtro.getDir().isBlank()
+                && !"asc".equalsIgnoreCase(filtro.getDir()) && !"desc".equalsIgnoreCase(filtro.getDir())) {
+            filtro.getAvisos().add("La dirección de ordenamiento no es válida; se usó el orden predeterminado.");
+            filtro.setDir(null);
+        }
+        filtro.setDir(filtro.isDescendente() ? "desc" : "asc");
     }
 
-    private PageRequest paginaDeReportes(int numero) {
-        return PageRequest.of(numero - 1, TAMANIO_PAGINA, Sort.by(Sort.Direction.DESC, "fechaReporte", "id"));
+    private Page<ReporteDano> buscarReportes(Long tipoDanoId, ReporteDanoFiltro filtro, int numero) {
+        return reporteDanoRepository.buscarPorFiltros(tipoDanoId, filtro.getNivel(), filtro.getEstado(),
+                paginaDeReportes(numero, filtro));
+    }
+
+    private PageRequest paginaDeReportes(int numero, ReporteDanoFiltro filtro) {
+        Sort.Direction direccion = filtro.isDescendente() ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort orden = Sort.by(direccion, PROPIEDADES_ORDEN.get(filtro.getOrdenValido()))
+                .and(Sort.by(direccion, "id"));
+        return PageRequest.of(numero - 1, filtro.getTamanioValido(), orden);
     }
 
     public String motivoParaNoReportar(Sismo sismo) {

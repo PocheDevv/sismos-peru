@@ -75,7 +75,11 @@ public class SismoFiltro {
     }
 
     private String url(Map<String, Object> parametros) {
-        UriComponentsBuilder url = UriComponentsBuilder.fromPath("/sismos");
+        return url("/sismos", parametros);
+    }
+
+    private String url(String ruta, Map<String, Object> parametros) {
+        UriComponentsBuilder url = UriComponentsBuilder.fromPath(ruta);
         parametros.forEach((nombre, valor) -> {
             if (valor != null) {
                 url.queryParam(nombre, valor);
@@ -91,6 +95,16 @@ public class SismoFiltro {
         p.put("dir", isDescendente() ? "desc" : "asc");
         p.put("pagina", numero);
         return url(p);
+    }
+
+    public String urlMapa() {
+        Map<String, Object> p = new LinkedHashMap<>();
+        p.put("departamentoId", departamentoId);
+        p.put("magnitudMin", magnitudMin);
+        p.put("magnitudMax", magnitudMax);
+        p.put("desde", desde);
+        p.put("hasta", hasta);
+        return url("/sismos/mapa", p);
     }
 
     /** URL para ordenar por una columna: si ya está ordenada por ella, invierte la dirección. */

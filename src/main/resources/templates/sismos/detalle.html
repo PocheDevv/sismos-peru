@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-    <head th:replace="~{fragments/layout :: head('Sismo ' + ${sismo.codigo})}"></head>
+    <head th:replace="~{fragments/layout :: headMapa('Sismo ' + ${sismo.codigo})}"></head>
     <body>
         <div th:replace="~{fragments/layout :: barra('sismos')}"></div>
         <main class="contenedor">
@@ -46,6 +46,11 @@
                     </div>
                     <div><div class="etiqueta">Referencia</div><div class="valor" th:text="${sismo.referencia} ?: '—'"></div></div>
                 </div>
+            </section>
+
+            <section class="tarjeta">
+                <h2 class="titulo-tarjeta">Ubicación exacta del sismo</h2>
+                <div th:replace="~{fragments/mapa :: visualizador(${sismosMapa}, ${sismo.latitud}, ${sismo.longitud}, 8)}"></div>
             </section>
 
             <section class="tarjeta">
@@ -118,5 +123,7 @@
                 </div>
             </section>
         </main>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script th:src="@{/js/mapa-sismos.js}"></script>
     </body>
 </html>
