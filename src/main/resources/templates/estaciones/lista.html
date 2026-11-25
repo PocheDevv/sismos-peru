@@ -72,7 +72,10 @@
                     <td th:text="${#temporals.format(e.fechaInstalacion, 'dd/MM/yyyy')}"></td>
                     <td th:text="${sismosPorEstacion.get(e.id)} ?: 0"></td>
                     <td><span class="badge" th:classappend="${e.activa} ? 'badge-activo' : 'badge-inactivo'" th:text="${e.estado}"></span></td>
-                    <td class="acciones-tabla"><a sec:authorize="hasRole('ADMIN')" th:href="@{/estaciones/{id}/editar(id=${e.id})}">Editar</a></td>
+                    <td class="acciones-tabla">
+                        <a th:href="@{/estaciones/{id}/sismos(id=${e.id})}">Ver sismos</a>
+                        <a sec:authorize="hasRole('ADMIN')" th:href="@{/estaciones/{id}/editar(id=${e.id})}">Editar</a>
+                    </td>
                 </tr>
                 </tbody>
             </table>

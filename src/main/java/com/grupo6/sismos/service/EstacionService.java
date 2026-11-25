@@ -1,6 +1,7 @@
 package com.grupo6.sismos.service;
 
 import com.grupo6.sismos.entity.EstacionMonitoreo;
+import com.grupo6.sismos.entity.Sismo;
 import com.grupo6.sismos.entity.Ubigeo;
 import com.grupo6.sismos.repository.EstacionMonitoreoRepository;
 import com.grupo6.sismos.repository.SismoRepository;
@@ -50,6 +51,19 @@ public class EstacionService {
         if (resultado.getTotalPages() > 0 && paginaIndice >= resultado.getTotalPages()) {
             resultado = estacionRepository.buscarFiltrado(
                     departamentoId, estadoLimpio, PageRequest.of(resultado.getTotalPages() - 1, tamanioValido));
+        }
+        return resultado;
+    }
+    
+    @Transactional(readOnly = true)
+    public Page<Sismo> listarSismosPorEstacion(Long estacionId, int pagina, int tamanio) {
+        int tamanioValido = normalizarTamanio(tamanio);
+        int paginaIndice = Math.max(pagina, 1) - 1;
+        Page<Sismo> resultado = estacionRepository.listarSismosPorEstacion(
+                estacionId, PageRequest.of(paginaIndice, tamanioValido));
+        if (resultado.getTotalPages() > 0 && paginaIndice >= resultado.getTotalPages()) {
+            resultado = estacionRepository.listarSismosPorEstacion(
+                    estacionId, PageRequest.of(resultado.getTotalPages() - 1, tamanioValido));
         }
         return resultado;
     }

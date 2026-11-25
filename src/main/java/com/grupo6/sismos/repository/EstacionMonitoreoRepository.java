@@ -1,6 +1,7 @@
 package com.grupo6.sismos.repository;
 
 import com.grupo6.sismos.entity.EstacionMonitoreo;
+import com.grupo6.sismos.entity.Sismo;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,4 +34,11 @@ public interface EstacionMonitoreoRepository extends JpaRepository<EstacionMonit
     Page<EstacionMonitoreo> buscarFiltrado(@Param("departamentoId") Long departamentoId,
                                            @Param("estado") String estado,
                                            Pageable pageable);
+    
+    @Query("""
+            SELECT s FROM Sismo s
+            WHERE s.estacion.id = :estacionId
+            ORDER BY s.fechaHora DESC
+            """)
+    Page<Sismo> listarSismosPorEstacion(@Param("estacionId") Long estacionId, Pageable pageable);
 }

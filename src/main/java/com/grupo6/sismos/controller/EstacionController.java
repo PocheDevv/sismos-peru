@@ -1,6 +1,7 @@
 package com.grupo6.sismos.controller;
 
 import com.grupo6.sismos.entity.EstacionMonitoreo;
+import com.grupo6.sismos.entity.Sismo;
 import com.grupo6.sismos.service.EstacionService;
 import com.grupo6.sismos.service.UbigeoService;
 import com.grupo6.sismos.web.error.ReglaNegocioException;
@@ -47,6 +48,23 @@ public class EstacionController {
         model.addAttribute("tamanioValido", tamanioValido);
         model.addAttribute("tieneFiltros", tieneFiltros);
         return "estaciones/lista";
+    }
+    
+    @GetMapping("/{id}/sismos")
+    public String sismosPorEstacion(@PathVariable Long id,
+                                    @RequestParam(defaultValue = "1") int pagina,
+                                    @RequestParam(defaultValue = "10") int tamanio,
+                                    Model model) {
+        EstacionMonitoreo estacion = estacionService.buscarPorId(id);
+        int tamanioValido = estacionService.normalizarTamanio(tamanio);
+        Page<Sismo> page = estacionService.listarSismosPorEstacion(id, pagina, tamanioValido);
+
+        model.addAttribute("estacion", estacion);
+        model.addAttribute("pagina", page);
+        model.addAttribute("sismos", page.getContent());
+        model.addAttribute("tamaniosPagina", EstacionService.TAMANIOS_PAGINA);
+        model.addAttribute("tamanioValido", tamanioValido);
+        return "estaciones/sismos";
     }
 
     @GetMapping("/nuevo")
