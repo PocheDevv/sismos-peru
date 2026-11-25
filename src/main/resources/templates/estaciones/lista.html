@@ -14,15 +14,57 @@
 
     <th:block th:replace="~{fragments/layout :: mensajes}"></th:block>
 
+    <!-- HU-23: filtrar estaciones por departamento y estado, con selector de filas -->
     <section class="tarjeta">
-        <h2 class="titulo-tarjeta" th:text="'Estaciones registradas: ' + ${estaciones.size()}"></h2>
+        <form method="get" th:action="@{/estaciones}" class="filtros">
+            <label>
+                <span>Departamento</span>
+                <select name="departamentoId">
+                    <option value="">Todos</option>
+                    <option th:each="d : ${departamentos}" th:value="${d.id}" th:text="${d.nombre}"
+                            th:selected="${d.id == departamentoId}"></option>
+                </select>
+            </label>
+            <label>
+                <span>Estado</span>
+                <select name="estado">
+                    <option value="">Todos</option>
+                    <option th:each="est : ${estados}" th:value="${est}" th:text="${est}"
+                            th:selected="${est == estado}"></option>
+                </select>
+            </label>
+            <label>
+                <span>Registros por página</span>
+                <select name="tamanio" onchange="this.form.submit()">
+                    <option th:each="tamano : ${tamaniosPagina}"
+                            th:value="${tamano}" th:text="${tamano}"
+                            th:selected="${tamano == tamanioValido}"></option>
+                </select>
+            </label>
+            <input type="hidden" name="pagina" value="1">
+            <div class="acciones">
+                <button class="boton" type="submit">Filtrar</button>
+                <a class="boton-secundario" th:href="@{/estaciones}">Limpiar</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="tarjeta">
+        <div class="barra-resultados">
+            <span th:if="${pagina.totalElements > 0}"
+                  th:text="'Mostrando ' + ${pagina.number * pagina.size + 1} + '–' + ${pagina.number * pagina.size + pagina.numberOfElements} + ' de ' + ${pagina.totalElements} + ' estación(es)'"></span>
+            <span th:if="${pagina.totalElements == 0}">0 estaciones</span>
+        </div>
         <div class="tabla-scroll">
             <table>
                 <thead>
                 <tr><th>Código</th><th>Nombre</th><th>Ubicación</th><th>Instalación</th><th>Sismos</th><th>Estado</th><th>Acciones</th></tr>
                 </thead>
                 <tbody>
-                <tr th:if="${estaciones.isEmpty()}"><td colspan="7" class="vacio">No hay estaciones registradas.</td></tr>
+                <tr th:if="${estaciones.isEmpty()}">
+                    <td colspan="7" class="vacio"
+                        th:text="${tieneFiltros} ? 'Ninguna estación cumple los filtros indicados.' : 'No hay estaciones registradas.'"></td>
+                </tr>
                 <tr th:each="e : ${estaciones}">
                     <td th:text="${e.codigo}"></td>
                     <td th:text="${e.nombre}"></td>
@@ -35,6 +77,21 @@
                 </tbody>
             </table>
         </div>
+
+        <nav class="paginacion" th:if="${pagina.totalPages > 1}">
+            <a th:if="${pagina.hasPrevious()}"
+               th:href="@{/estaciones(departamentoId=${departamentoId}, estado=${estado}, tamanio=${tamanioValido}, pagina=${pagina.number})}">‹ Anterior</a>
+            <span th:unless="${pagina.hasPrevious()}" class="deshabilitado">‹ Anterior</span>
+            <th:block th:each="n : ${#numbers.sequence(1, pagina.totalPages)}">
+                <span th:if="${n == pagina.number + 1}" class="actual" th:text="${n}"></span>
+                <a th:unless="${n == pagina.number + 1}"
+                   th:href="@{/estaciones(departamentoId=${departamentoId}, estado=${estado}, tamanio=${tamanioValido}, pagina=${n})}"
+                   th:text="${n}"></a>
+            </th:block>
+            <a th:if="${pagina.hasNext()}"
+               th:href="@{/estaciones(departamentoId=${departamentoId}, estado=${estado}, tamanio=${tamanioValido}, pagina=${pagina.number + 2})}">Siguiente ›</a>
+            <span th:unless="${pagina.hasNext()}" class="deshabilitado">Siguiente ›</span>
+        </nav>
     </section>
 </main>
 </body>

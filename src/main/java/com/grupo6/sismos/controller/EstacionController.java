@@ -6,6 +6,7 @@ import com.grupo6.sismos.service.UbigeoService;
 import com.grupo6.sismos.web.error.ReglaNegocioException;
 import com.grupo6.sismos.web.form.EstacionForm;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,9 +27,25 @@ public class EstacionController {
     }
 
     @GetMapping
-    public String listar(Model model) {
-        model.addAttribute("estaciones", estacionService.listar());
+    public String listar(@RequestParam(required = false) Long departamentoId,
+                         @RequestParam(required = false) String estado,
+                         @RequestParam(defaultValue = "1") int pagina,
+                         @RequestParam(defaultValue = "10") int tamanio,
+                         Model model) {
+        int tamanioValido = estacionService.normalizarTamanio(tamanio);
+        Page<EstacionMonitoreo> page = estacionService.listarPaginado(departamentoId, estado, pagina, tamanioValido);
+        boolean tieneFiltros = departamentoId != null || (estado != null && !estado.isBlank());
+
+        model.addAttribute("pagina", page);
+        model.addAttribute("estaciones", page.getContent());
         model.addAttribute("sismosPorEstacion", estacionService.contarSismosPorEstacion());
+        model.addAttribute("departamentos", estacionService.listarDepartamentos());
+        model.addAttribute("estados", EstacionService.ESTADOS);
+        model.addAttribute("tamaniosPagina", EstacionService.TAMANIOS_PAGINA);
+        model.addAttribute("departamentoId", departamentoId);
+        model.addAttribute("estado", estado);
+        model.addAttribute("tamanioValido", tamanioValido);
+        model.addAttribute("tieneFiltros", tieneFiltros);
         return "estaciones/lista";
     }
 

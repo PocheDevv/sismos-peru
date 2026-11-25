@@ -12,12 +12,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /** HU-10 (gestionar estaciones) y HU-11 (sismos registrados por cada estación). */
 @Service
 public class EstacionService {
+    
+    public static final List<Integer> TAMANIOS_PAGINA = List.of(5, 10, 20, 50);
+    public static final List<String> ESTADOS = List.of("ACTIVO", "INACTIVO");
 
     private final EstacionMonitoreoRepository estacionRepository;
     private final UbigeoRepository ubigeoRepository;
@@ -36,12 +41,41 @@ public class EstacionService {
     }
 
     @Transactional(readOnly = true)
+    public Page<EstacionMonitoreo> listarPaginado(Long departamentoId, String estado, int pagina, int tamanio) {
+        int tamanioValido = normalizarTamanio(tamanio);
+        int paginaIndice = Math.max(pagina, 1) - 1;
+        String estadoLimpio = (estado == null || estado.isBlank()) ? null : estado.trim().toUpperCase(Locale.ROOT);
+        Page<EstacionMonitoreo> resultado = estacionRepository.buscarFiltrado(
+                departamentoId, estadoLimpio, PageRequest.of(paginaIndice, tamanioValido));
+        if (resultado.getTotalPages() > 0 && paginaIndice >= resultado.getTotalPages()) {
+            resultado = estacionRepository.buscarFiltrado(
+                    departamentoId, estadoLimpio, PageRequest.of(resultado.getTotalPages() - 1, tamanioValido));
+        }
+        return resultado;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Ubigeo> listarDepartamentos() {
+        return ubigeoRepository.findByPadreIsNullOrderByCodigoAsc();
+    }
+
+    public int normalizarTamanio(int tamanio) {
+        if (tamanio < 5) {
+            return 10;
+        }
+        if (tamanio > 50) {
+            return 50;
+        }
+        return TAMANIOS_PAGINA.contains(tamanio) ? tamanio : 10;
+    }
+    @Transactional(readOnly = true)
     public EstacionMonitoreo buscarPorId(Long id) {
         return estacionRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("No existe la estación solicitada."));
     }
 
-    /** HU-11: id de estación → cantidad de sismos que registró. */
+    /** HU-11: id de estación → cantidad de sismos que registró.
+     * @return  */
     @Transactional(readOnly = true)
     public Map<Long, Long> contarSismosPorEstacion() {
         Map<Long, Long> totales = new HashMap<>();
