@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Sismos de ' + ${estacion.codigo})}"></head>
+<body>
+<div th:replace="~{fragments/layout :: barra('estaciones')}"></div>
+<main class="contenedor">
+    <div class="encabezado">
+        <div>
+            <h1 th:text="'Sismos registrados por ' + ${estacion.codigo} + ' — ' + ${estacion.nombre}"></h1>
+            <p class="subtitulo">
+                <span th:text="'Ubicación: ' + ${estacion.ubigeo.ubicacionCompleta} + ' · Estado: '"></span>
+                <span class="badge" th:classappend="${estacion.activa} ? 'badge-activo' : 'badge-inactivo'"
+                      th:text="${estacion.estado}"></span>
+            </p>
+        </div>
+        <a class="boton-secundario" th:href="@{/estaciones}">← Volver a estaciones</a>
+    </div>
+
+    <section class="tarjeta">
+        <div class="barra-resultados">
+            <span th:if="${pagina.totalElements > 0}"
+                  th:text="'Mostrando ' + ${pagina.number * pagina.size + 1} + '–' + ${pagina.number * pagina.size + pagina.numberOfElements} + ' de ' + ${pagina.totalElements} + ' sismo(s)'"></span>
+            <span th:if="${pagina.totalElements == 0}">0 sismos registrados en esta estación</span>
+
+            <form method="get" th:action="@{/estaciones/{id}/sismos(id=${estacion.id})}" class="filtros">
+                <label>
+                    <span>Registros por página</span>
+                    <select name="tamanio" onchange="this.form.submit()">
+                        <option th:each="tamano : ${tamaniosPagina}"
+                                th:value="${tamano}" th:text="${tamano}"
+                                th:selected="${tamano == tamanioValido}"></option>
+                    </select>
+                </label>
+                <input type="hidden" name="pagina" value="1">
+            </form>
+        </div>
+
+        <div class="tabla-scroll">
+            <table>
+                <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Fecha y hora</th>
+                    <th>Magnitud</th>
+                    <th>Profundidad</th>
+                    <th>Ubicación</th>
+                    <th>Alerta</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${sismos.isEmpty()}">
+                    <td colspan="8" class="vacio">Esta estación aún no tiene sismos registrados.</td>
+                </tr>
+                <tr th:each="s : ${sismos}">
+                    <td>
+                        <a th:href="@{/sismos/{id}(id=${s.id})}" th:text="${s.codigo}"></a>
+                        <span th:if="${s.relevante}" class="badge badge-relevante">Relevante</span>
+                    </td>
+                    <td th:text="${#temporals.format(s.fechaHora, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td th:text="'M ' + ${#numbers.formatDecimal(s.magnitud, 1, 1)}"></td>
+                    <td th:text="${#numbers.formatDecimal(s.profundidad, 1, 0)} + ' km'"></td>
+                    <td th:text="${s.ubigeo.ubicacionCompleta}"></td>
+                    <td><span th:class="${s.tipoAlerta.claseColor}" th:text="${s.tipoAlerta.nombre}"></span></td>
+                    <td><span th:class="${s.claseEstado}" th:text="${s.estado}"></span></td>
+                    <td class="acciones-tabla">
+                        <a th:href="@{/sismos/{id}(id=${s.id})}">Ver</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <nav class="paginacion" th:if="${pagina.totalPages > 1}">
+            <a th:if="${pagina.hasPrevious()}"
+               th:href="@{/estaciones/{id}/sismos(id=${estacion.id}, tamanio=${tamanioValido}, pagina=${pagina.number})}">‹ Anterior</a>
+            <span th:unless="${pagina.hasPrevious()}" class="deshabilitado">‹ Anterior</span>
+            <th:block th:each="n : ${#numbers.sequence(1, pagina.totalPages)}">
+                <span th:if="${n == pagina.number + 1}" class="actual" th:text="${n}"></span>
+                <a th:unless="${n == pagina.number + 1}"
+                   th:href="@{/estaciones/{id}/sismos(id=${estacion.id}, tamanio=${tamanioValido}, pagina=${n})}"
+                   th:text="${n}"></a>
+            </th:block>
+            <a th:if="${pagina.hasNext()}"
+               th:href="@{/estaciones/{id}/sismos(id=${estacion.id}, tamanio=${tamanioValido}, pagina=${pagina.number + 2})}">Siguiente ›</a>
+            <span th:unless="${pagina.hasNext()}" class="deshabilitado">Siguiente ›</span>
+        </nav>
+    </section>
+</main>
+</body>
+</html>
