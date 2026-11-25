@@ -78,8 +78,8 @@ Son credenciales de laboratorio, solo para la demostración.
 | 4 | HU-16 | Ver indicadores del dashboard | Víctor | ✅ |
 | 4 | HU-17 | Ver gráficos estadísticos | Víctor | ✅ |
 | 4 | HU-42 | Elegir tamaño de página y ordenar listados (Reportes y Sismos) | Nick | ✅ |
-| 4 | HU-24 | Ver los sismos registrados por una estación | Cristian | ⏳ |
-| 4 | HU-23 | Filtrar estaciones por departamento y estado | Cristian | ⏳ |
+| 4 | HU-24 | Ver los sismos registrados por una estación | Cristian | ✅ |
+| 4 | HU-23 | Filtrar estaciones por departamento y estado | Cristian | ✅ |
 | 4 | HU-22 | Proteger ubicaciones que están en uso | Cristian | ✅ |
 | 4 | HU-18 | Visualizar sismos en un mapa | Nick | ✅ |
 | 4 | HU-32 | Filtrar los sismos mostrados en el mapa | Nick | ✅ |
@@ -144,8 +144,9 @@ Ejemplos completos: `SismoController` + `SismoService` + `SismoForm` + `template
   magnitud a una cifra decimal: verde para M < 4, ámbar para M 4–5.9 y rojo para M ≥ 6. Leaflet y el mapa
   base de OpenStreetMap se cargan desde CDN; si no hay conexión, el mapa informa que no pudo cargar y la
   aplicación permanece utilizable.
-- **HU-24 y HU-23 (Cristian) — Estaciones**: sismos registrados por una estación y filtro de
-  estaciones por departamento y estado, con paginación.
+- **HU-24 y HU-23 (Cristian) — Estaciones**: botón «Ver sismos» en cada estación
+  (`/estaciones/{id}/sismos`, paginado) y filtro de estaciones por departamento y estado, con selector de
+  5, 10, 20 y 50 filas por página.
 
 Reglas del equipo: una rama por HU desde `main` actualizado, Pull Request para unir, no subir
 `application-local.properties`, `target/` ni `.idea/`, y sin líneas "Co-Authored-By" en los commits.

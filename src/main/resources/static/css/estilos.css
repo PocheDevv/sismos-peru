@@ -189,3 +189,9 @@ th a:hover { color: #111827; }
 .resumen-marcador a { display: inline-block; margin-top: 6px; color: #2563eb; }
 .alerta-info { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
 @media (max-width: 720px) { .mapa-canvas { height: 340px; } }
+
+/* Enlaces dentro de las tablas (códigos de sismo, etc.): mismo azul del sistema, sin subrayado ni morado de "visitado" */
+td a { color: #2563eb; text-decoration: none; font-weight: 600; }
+td a:visited { color: #2563eb; }
+td a:hover { text-decoration: underline; }
+.acciones-tabla a { font-weight: 400; }
